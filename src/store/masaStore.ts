@@ -3,7 +3,7 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { gunAnahtari, masaBaslatabilirMi } from '@/core/gunlukSinir';
+import { masaBaslatabilirMi, yeniSinirGunu } from '@/core/gunlukSinir';
 import { TOPLAM_EL_SAYISI } from '@/core/sabitler';
 import { kingMi, puanHesapla } from '@/core/skor';
 import type { El, Koz, Masa, Oyuncu, OyunTuru } from '@/core/tipler';
@@ -56,9 +56,9 @@ export const useMasaStore = create<MasaDurumu>()(
         set({
           aktifMasa: masa,
           sonOyuncular: oyuncular,
-          // Günlük ücretsiz sınır takibi: en son görülen günü ileri taşı,
-          // saat geri alındıysa geriye düşürme
-          sonMasaGunu: [get().sonMasaGunu ?? '', gunAnahtari(Date.now())].sort().pop() ?? null,
+          // Günlük ücretsiz sınır takibi: saat geri alındıysa en son görülen günü
+          // korur, aşırı gelecekteki bozuk kaydı gerçek tarihe göre sıfırlar
+          sonMasaGunu: yeniSinirGunu(get().sonMasaGunu, Date.now()),
         });
       },
 

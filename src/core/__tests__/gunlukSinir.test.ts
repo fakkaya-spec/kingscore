@@ -1,6 +1,12 @@
-// Günlük masa sınırı testleri: gün dönümü, ay/yıl sınırı, saat geri alma istismarı.
+// Günlük masa sınırı testleri: gün dönümü, ay/yıl sınırı, saat geri alma istismarı,
+// yanlışlıkla yıllarca ileri giden cihaz saati.
 
-import { gunAnahtari, masaBaslatabilirMi } from '../gunlukSinir';
+import {
+  gunAnahtari,
+  ILERI_SAPMA_ESIGI_GUN,
+  masaBaslatabilirMi,
+  yeniSinirGunu,
+} from '../gunlukSinir';
 
 // Yerel saate göre zaman damgası üretir (test, çalıştığı saat diliminden bağımsızdır)
 function ts(yil: number, ay: number, gun: number, saat = 12): number {
@@ -47,5 +53,37 @@ describe('masaBaslatabilirMi', () => {
 
   test('saat istismarı kalıcı kilit yaratmaz: gerçek zaman günü geçince açılır', () => {
     expect(masaBaslatabilirMi('2026-08-05', ts(2026, 8, 6))).toBe(true);
+  });
+
+  test('cihaz saati yanlışlıkla 2 YIL ileri gitmişse kayıt bozuk sayılır, kilitlemez', () => {
+    // Senaryo: saat 2028'e atladı, o gün masa açıldı ("2028-08-03" kaydedildi),
+    // sonra tarih gerçek güne (2026) düzeldi. Kullanıcı beklemeden ve
+    // ertesi gün de yeni masa açabilmeli — 2028'e kadar kilit YOK.
+    expect(masaBaslatabilirMi('2028-08-03', ts(2026, 8, 3))).toBe(true);
+    expect(masaBaslatabilirMi('2028-08-03', ts(2026, 8, 4))).toBe(true);
+  });
+
+  test('ileri sapma eşiği: eşik içi korunur, eşik ötesi bozuk sayılır', () => {
+    // 2 gün ilerideki kayıt hâlâ "saat oynama" sayılır → kilitli
+    expect(masaBaslatabilirMi('2026-08-05', ts(2026, 8, 3))).toBe(false);
+    // 3 gün (eşik + 1) ilerideki kayıt bozuktur → izin verilir
+    expect(masaBaslatabilirMi('2026-08-06', ts(2026, 8, 3))).toBe(true);
+    expect(ILERI_SAPMA_ESIGI_GUN).toBe(2);
+  });
+});
+
+describe('yeniSinirGunu', () => {
+  test('normalde bugünü yazar', () => {
+    expect(yeniSinirGunu(null, ts(2026, 8, 3))).toBe('2026-08-03');
+    expect(yeniSinirGunu('2026-08-01', ts(2026, 8, 3))).toBe('2026-08-03');
+  });
+
+  test('saat geri alındıysa (eşik içi) en son görülen günü korur', () => {
+    expect(yeniSinirGunu('2026-08-05', ts(2026, 8, 3))).toBe('2026-08-05');
+  });
+
+  test('aşırı gelecekteki bozuk kaydı gerçek tarihe göre sıfırlar', () => {
+    // 2028 kaydı saklanmaya devam etseydi kullanıcı yıllarca kilitli kalırdı
+    expect(yeniSinirGunu('2028-08-03', ts(2026, 8, 3))).toBe('2026-08-03');
   });
 });
