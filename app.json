@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "King Skor",
+    "slug": "kingscore",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "kingskor",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#0B3D2E",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kingskor.app"
+    },
+    "android": {
+      "package": "com.kingskor.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B3D2E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sharing",
+      "expo-audio"
+    ]
+  }
+}
