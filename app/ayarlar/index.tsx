@@ -1,19 +1,21 @@
-// Ayarlar: sesler, animasyonlar, King kuralı, tema (premium), puan tablosu, yedekleme.
+// Ayarlar: sesler, animasyonlar, King kuralı, masa teması, puan tablosu, yedekleme.
 
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
 import { disaAktar, iceAktar } from '@/servisler/yedekleme';
-import { useAyarStore } from '@/store/ayarStore';
-import { usePremium } from '@/store/premiumStore';
-import { useRenkler } from '@/tema/renkler';
+import { useAyarStore, type Tema } from '@/store/ayarStore';
+import { usePro } from '@/store/proStore';
+import { TEMALAR, TEMA_ADLARI, useRenkler } from '@/tema/renkler';
+
+const TEMA_SIRASI: Tema[] = ['cuha', 'ahsap', 'gece'];
 
 export default function AyarlarEkrani() {
   const router = useRouter();
   const r = useRenkler();
   const ayarlar = useAyarStore();
-  const premiumMu = usePremium();
+  const proMu = usePro();
 
   const satir = (baslik: string, aciklama: string, deger: boolean, degistir: (v: boolean) => void) => (
     <View style={[stiller.satir, { borderBottomColor: r.cizgi }]}>
@@ -46,23 +48,46 @@ export default function AyarlarEkrani() {
         ayarlar.kingdeBiter,
         ayarlar.kingdeBiterAc,
       )}
-      {satir(
-        premiumMu ? 'Açık tema' : 'Açık tema 🔒',
-        premiumMu ? 'Krem zeminli aydınlık görünüm' : 'Tema seçimi King Skor Pro ile açılır',
-        ayarlar.tema === 'acik',
-        (v) => {
-          if (!premiumMu) {
-            router.push('/paywall');
-            return;
-          }
-          ayarlar.temaSec(v ? 'acik' : 'koyu');
-        },
-      )}
+
+      {/* Masa teması: yeşil çuha ücretsiz; ahşap ve gece mavisi Pro */}
+      <Text style={[stiller.bolum, { color: r.altin }]}>Masa Teması</Text>
+      <View style={stiller.temalar}>
+        {TEMA_SIRASI.map((tema) => {
+          const kilitli = tema !== 'cuha' && !proMu;
+          const secili = ayarlar.tema === tema;
+          const onizleme = TEMALAR[tema];
+          return (
+            <Pressable
+              key={tema}
+              onPress={() => {
+                if (kilitli) {
+                  router.push('/paywall');
+                  return;
+                }
+                ayarlar.temaSec(tema);
+              }}
+              style={[
+                stiller.temaKarti,
+                {
+                  backgroundColor: onizleme.zemin,
+                  borderColor: secili ? r.altin : r.cizgi,
+                  borderWidth: secili ? 3 : 1,
+                },
+              ]}
+            >
+              <Text style={[stiller.temaAdi, { color: onizleme.metin }]}>
+                {kilitli ? '🔒 ' : secili ? '✓ ' : ''}
+                {TEMA_ADLARI[tema]}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
       <Buton
-        baslik={premiumMu ? 'Puan Tablosunu Özelleştir' : 'Puan Tablosunu Özelleştir 🔒'}
+        baslik={proMu ? 'Puan Tablosunu Özelleştir' : 'Puan Tablosunu Özelleştir 🔒'}
         tur="ikincil"
-        onPress={() => router.push(premiumMu ? '/ayarlar/puan-tablosu' : '/paywall')}
+        onPress={() => router.push('/ayarlar/puan-tablosu')}
         stil={stiller.aralik}
       />
       <Buton baslik="King Skor Pro" onPress={() => router.push('/paywall')} stil={stiller.aralik} />
@@ -94,5 +119,15 @@ const stiller = StyleSheet.create({
   satirAciklama: { fontSize: 13, marginTop: 2 },
   aralik: { marginTop: 10 },
   bolum: { fontSize: 15, fontWeight: '900', marginTop: 24, letterSpacing: 1 },
+  temalar: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  temaKarti: {
+    flex: 1,
+    minHeight: 72,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 8,
+  },
+  temaAdi: { fontSize: 13, fontWeight: '800', textAlign: 'center' },
   surum: { textAlign: 'center', marginTop: 24, fontSize: 12 },
 });

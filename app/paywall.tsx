@@ -1,56 +1,39 @@
-// King Skor Pro paywall'u. Fiyatlar mağazadan dinamik okunur, koda sabit yazılmaz.
-// Yalnız yıllık abonelik ve ömür boyu (tek seferlik) ürünler vardır.
+// King Skor Pro paywall'u. Tek ürün: ömür boyu (non-consumable), abonelik YOK.
+// Fiyat mağazadan dinamik okunur. Karanlık desen yok; X ile kapatınca hiçbir şey kaybolmaz.
 
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
-import {
-  geriYukle,
-  paketleriGetir,
-  satinAl,
-  URUN_OMUR_BOYU,
-  URUN_YILLIK,
-  type SatisPaketi,
-} from '@/servisler/satinalma';
+import { geriYukle, proPaketiGetir, satinAl, type ProPaketi } from '@/servisler/satinalma';
 import { basariTitret } from '@/servisler/titresim';
-import { usePremium } from '@/store/premiumStore';
+import { usePro } from '@/store/proStore';
 import { useRenkler } from '@/tema/renkler';
 
-const AVANTAJLAR = [
-  'Geçmiş masalar & istatistikler',
+const OZELLIKLER = [
+  'Sınırsız masa (günlük limit kalkar)',
+  'Geçmiş masalar ve oyuncu istatistikleri',
   'Puan tablosunu özelleştirme',
   'Filigransız skor paylaşımı',
-  'Tema seçimi',
+  'Ekstra masa temaları: ahşap & gece mavisi',
 ];
 
 export default function PaywallEkrani() {
   const router = useRouter();
   const r = useRenkler();
-  const premiumMu = usePremium();
-  const [paketler, setPaketler] = useState<SatisPaketi[]>([]);
+  const proMu = usePro();
+  const [paket, setPaket] = useState<ProPaketi | null>(null);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [islemde, setIslemde] = useState(false);
 
   useEffect(() => {
-    paketleriGetir().then((gelen) => {
-      setPaketler(gelen);
+    proPaketiGetir().then((gelen) => {
+      setPaket(gelen);
       setYukleniyor(false);
     });
   }, []);
 
-  useEffect(() => {
-    if (premiumMu) {
-      // Satın alma tamamlandıysa ekranı kapat
-      const zamanlayici = setTimeout(() => router.back(), 600);
-      return () => clearTimeout(zamanlayici);
-    }
-  }, [premiumMu, router]);
-
-  const omurBoyu = paketler.find((p) => p.urunId.includes(URUN_OMUR_BOYU));
-  const yillik = paketler.find((p) => p.urunId.includes(URUN_YILLIK));
-
-  const al = async (paket?: SatisPaketi) => {
+  const al = async () => {
     if (!paket || islemde) return;
     setIslemde(true);
     const basarili = await satinAl(paket.paket);
@@ -67,15 +50,25 @@ export default function PaywallEkrani() {
     setIslemde(false);
     Alert.alert(
       bulundu ? 'Geri yüklendi 👑' : 'Satın alım bulunamadı',
-      bulundu
-        ? 'King Skor Pro aktif.'
-        : 'Bu hesapla yapılmış bir satın alım bulunamadı.',
+      bulundu ? 'King Skor Pro aktif.' : 'Bu hesapla yapılmış bir satın alım bulunamadı.',
     );
   };
 
-  if (premiumMu) {
+  // Sağ üstte kolayca kapatılabilen X — kapatınca hiçbir şey kaybolmaz
+  const kapatmaTusu = (
+    <Pressable
+      accessibilityLabel="Kapat"
+      onPress={() => router.back()}
+      style={stiller.kapatTusu}
+    >
+      <Text style={{ color: r.altin, fontSize: 22, fontWeight: '800' }}>✕</Text>
+    </Pressable>
+  );
+
+  if (proMu) {
     return (
       <View style={[stiller.merkez, { backgroundColor: r.zemin }]}>
+        <Stack.Screen options={{ headerRight: () => kapatmaTusu }} />
         <Text style={stiller.buyukEmoji}>👑</Text>
         <Text style={[stiller.tesekkur, { color: r.metin }]}>King Skor Pro aktif. İyi oyunlar!</Text>
       </View>
@@ -84,53 +77,46 @@ export default function PaywallEkrani() {
 
   return (
     <ScrollView style={{ backgroundColor: r.zemin }} contentContainerStyle={stiller.icerik}>
+      <Stack.Screen options={{ headerRight: () => kapatmaTusu }} />
+
       <Text style={[stiller.baslik, { color: r.altin }]}>King Skor Pro</Text>
-      <View style={stiller.avantajlar}>
-        {AVANTAJLAR.map((a) => (
-          <Text key={a} style={[stiller.avantaj, { color: r.metin }]}>
-            ✓ {a}
+
+      {/* Tek büyük kart: ömür boyu */}
+      <Pressable
+        onPress={al}
+        disabled={islemde || !paket}
+        style={[stiller.urunKarti, { backgroundColor: r.kart, borderColor: r.altin }]}
+      >
+        <Text style={[stiller.urunAdi, { color: r.kartUstu }]}>Ömür Boyu</Text>
+        <Text style={[stiller.fiyat, { color: r.kartUstu }]}>
+          {paket?.fiyatMetni ?? (yukleniyor ? '…' : '—')}
+        </Text>
+        <Text style={[stiller.urunAciklama, { color: '#5a5142' }]}>
+          Bir kez öde, ömür boyu kullan. Abonelik yok, yenileme yok.
+        </Text>
+      </Pressable>
+
+      <View style={stiller.ozellikler}>
+        {OZELLIKLER.map((o) => (
+          <Text key={o} style={[stiller.ozellik, { color: r.metin }]}>
+            ✓ {o}
           </Text>
         ))}
       </View>
 
-      {/* İki kart yan yana: Ömür Boyu (önerilen) + 1 Yıllık */}
-      <View style={stiller.kartlar}>
-        <Pressable
-          onPress={() => al(omurBoyu)}
-          style={[stiller.urunKarti, stiller.onerilen, { backgroundColor: r.kart, borderColor: r.altin }]}
-        >
-          <View style={[stiller.rozet, { backgroundColor: r.altin }]}>
-            <Text style={stiller.rozetMetni}>EN ÇOK TERCİH EDİLEN</Text>
-          </View>
-          <Text style={[stiller.urunAdi, { color: r.kartUstu }]}>Ömür Boyu</Text>
-          <Text style={[stiller.fiyat, { color: r.kartUstu }]}>
-            {omurBoyu?.fiyatMetni ?? (yukleniyor ? '…' : '—')}
-          </Text>
-          <Text style={[stiller.urunAciklama, { color: '#5a5142' }]}>
-            Bir kez öde, ömür boyu kullan. Yenileme yok.
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => al(yillik)}
-          style={[stiller.urunKarti, { backgroundColor: r.kart, borderColor: r.cizgi }]}
-        >
-          <Text style={[stiller.urunAdi, { color: r.kartUstu }]}>1 Yıllık</Text>
-          <Text style={[stiller.fiyat, { color: r.kartUstu }]}>
-            {yillik?.fiyatMetni ?? (yukleniyor ? '…' : '—')}
-          </Text>
-          <Text style={[stiller.urunAciklama, { color: '#5a5142' }]}>
-            Yıllık abonelik. İstediğin zaman iptal et.
-          </Text>
-        </Pressable>
-      </View>
-
-      {!yukleniyor && paketler.length === 0 && (
+      {!yukleniyor && !paket && (
         <Text style={[stiller.magazaUyari, { color: r.soluk }]}>
           Mağazaya şu anda ulaşılamıyor. İnternet bağlantınızı kontrol edip tekrar deneyin.
         </Text>
       )}
 
+      <Buton
+        baslik={islemde ? 'İşleniyor…' : 'Pro’ya Geç'}
+        buyuk
+        pasif={islemde || !paket}
+        onPress={al}
+        stil={stiller.aralik}
+      />
       <Buton
         baslik="Satın Alımları Geri Yükle"
         tur="ikincil"
@@ -138,18 +124,9 @@ export default function PaywallEkrani() {
         pasif={islemde}
         stil={stiller.aralik}
       />
-      <Buton baslik="Şimdi Değil" tur="ikincil" onPress={() => router.back()} stil={stiller.aralik} />
 
-      <Text style={[stiller.kosullar, { color: r.soluk }]}>
-        Yıllık abonelik, dönem sonunda mağaza hesabınızdan otomatik yenilenir. Yenilemeyi
-        dilediğiniz an mağaza hesap ayarlarınızdan kapatabilirsiniz. Ödeme, satın almanın
-        onaylanmasıyla mağaza hesabınıza yansıtılır.
-      </Text>
       <View style={stiller.baglantilar}>
-        <Text
-          onPress={() => router.push('/gizlilik')}
-          style={[stiller.baglanti, { color: r.altin }]}
-        >
+        <Text onPress={() => router.push('/gizlilik')} style={[stiller.baglanti, { color: r.altin }]}>
           Gizlilik Politikası
         </Text>
         <Text
@@ -158,7 +135,7 @@ export default function PaywallEkrani() {
           }
           style={[stiller.baglanti, { color: r.altin }]}
         >
-          Kullanım Şartları (EULA)
+          Kullanım Koşulları (EULA)
         </Text>
       </View>
     </ScrollView>
@@ -167,36 +144,23 @@ export default function PaywallEkrani() {
 
 const stiller = StyleSheet.create({
   icerik: { padding: 20, paddingBottom: 40 },
-  baslik: { fontSize: 30, fontWeight: '900', textAlign: 'center', marginBottom: 12 },
-  avantajlar: { gap: 6, marginBottom: 20, alignSelf: 'center' },
-  avantaj: { fontSize: 16, fontWeight: '600' },
-  kartlar: { flexDirection: 'row', gap: 12 },
+  baslik: { fontSize: 30, fontWeight: '900', textAlign: 'center', marginBottom: 16 },
   urunKarti: {
-    flex: 1,
-    borderRadius: 18,
-    borderWidth: 2,
-    padding: 16,
-    paddingTop: 22,
+    borderRadius: 20,
+    borderWidth: 3,
+    padding: 22,
     alignItems: 'center',
-    minHeight: 160,
   },
-  onerilen: { borderWidth: 3 },
-  rozet: {
-    position: 'absolute',
-    top: -12,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  rozetMetni: { fontSize: 10, fontWeight: '900', color: '#1A1A1A' },
-  urunAdi: { fontSize: 18, fontWeight: '800' },
-  fiyat: { fontSize: 26, fontWeight: '900', marginVertical: 6, fontVariant: ['tabular-nums'] },
-  urunAciklama: { fontSize: 12, textAlign: 'center', lineHeight: 17 },
+  urunAdi: { fontSize: 20, fontWeight: '800' },
+  fiyat: { fontSize: 40, fontWeight: '900', marginVertical: 6, fontVariant: ['tabular-nums'] },
+  urunAciklama: { fontSize: 14, textAlign: 'center', lineHeight: 20, fontWeight: '600' },
+  ozellikler: { gap: 8, marginTop: 18, alignSelf: 'center' },
+  ozellik: { fontSize: 16, fontWeight: '600' },
   magazaUyari: { textAlign: 'center', marginTop: 14, fontSize: 13 },
   aralik: { marginTop: 12 },
-  kosullar: { fontSize: 11, lineHeight: 16, marginTop: 16, textAlign: 'center' },
-  baglantilar: { flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 10 },
+  baglantilar: { flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 14 },
   baglanti: { fontSize: 13, fontWeight: '700', textDecorationLine: 'underline', padding: 8 },
+  kapatTusu: { minWidth: 48, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   merkez: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   buyukEmoji: { fontSize: 72 },
   tesekkur: { fontSize: 18, fontWeight: '700' },

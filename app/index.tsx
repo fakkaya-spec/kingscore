@@ -7,15 +7,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Buton } from '@/bilesenler/Buton';
 import { TOPLAM_EL_SAYISI } from '@/core/sabitler';
 import { hafifTitret } from '@/servisler/titresim';
-import { usePremium } from '@/store/premiumStore';
-import { useMasaStore } from '@/store/masaStore';
+import { usePro } from '@/store/proStore';
+import { useMasaStore, yeniMasaHakkiVarMi } from '@/store/masaStore';
 import { useRenkler } from '@/tema/renkler';
 
 export default function AnaEkran() {
   const router = useRouter();
   const r = useRenkler();
   const aktifMasa = useMasaStore((d) => d.aktifMasa);
-  const premiumMu = usePremium();
+  const proMu = usePro();
 
   return (
     <SafeAreaView style={[stiller.govde, { backgroundColor: r.zemin }]}>
@@ -46,13 +46,16 @@ export default function AnaEkran() {
         <Buton
           baslik="YENİ MASA"
           buyuk
-          onPress={() => router.push('/oyuncular')}
+          onPress={() => {
+            // Ücretsizde günde 1 masa; hakkı bitince paywall (masa ortasında asla kilit yok)
+            router.push(yeniMasaHakkiVarMi(proMu) ? '/oyuncular' : '/paywall');
+          }}
           stil={stiller.aralik}
         />
         <Buton
-          baslik={premiumMu ? 'Geçmiş Masalar' : 'Geçmiş Masalar 🔒'}
+          baslik={proMu ? 'Geçmiş Masalar' : 'Geçmiş Masalar 🔒'}
           tur="ikincil"
-          onPress={() => router.push(premiumMu ? '/gecmis' : '/paywall')}
+          onPress={() => router.push('/gecmis')}
           stil={stiller.aralik}
         />
         <Buton

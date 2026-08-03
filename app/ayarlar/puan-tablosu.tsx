@@ -8,7 +8,7 @@ import { Buton } from '@/bilesenler/Buton';
 import { HEDEF_BIRIM, OYUN_ADI, PUAN_ALANI } from '@/core/sabitler';
 import type { OyunTuru } from '@/core/tipler';
 import { useAyarStore } from '@/store/ayarStore';
-import { usePremium } from '@/store/premiumStore';
+import { usePro } from '@/store/proStore';
 import { useRenkler } from '@/tema/renkler';
 
 const SIRA: OyunTuru[] = [
@@ -25,26 +25,23 @@ export default function PuanTablosuEkrani() {
   const router = useRouter();
   const r = useRenkler();
   const { puanTablosu, puanGuncelle, varsayilanaDon } = useAyarStore();
-  const premiumMu = usePremium();
+  const proMu = usePro();
 
-  if (!premiumMu) {
-    return (
-      <View style={[stiller.kilit, { backgroundColor: r.zemin }]}>
-        <Text style={stiller.kilitEmoji}>🔒</Text>
-        <Text style={[stiller.kilitMetin, { color: r.metin }]}>
-          Puan tablosunu özelleştirme King Skor Pro ile açılır.
-        </Text>
-        <Buton baslik="Pro'yu İncele" onPress={() => router.push('/paywall')} />
-      </View>
-    );
-  }
-
+  // Ücretsiz kullanıcı ekranı görür ama düzenleyemez — kilit rozeti üstte durur
   return (
     <ScrollView
       style={{ backgroundColor: r.zemin }}
       contentContainerStyle={stiller.icerik}
       keyboardShouldPersistTaps="handled"
     >
+      {!proMu && (
+        <View style={[stiller.kilitBandi, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}>
+          <Text style={[stiller.kilitMetin, { color: r.altin }]}>
+            🔒 Puan tablosunu özelleştirme Pro ile açılır
+          </Text>
+          <Buton baslik="Pro'yu İncele" onPress={() => router.push('/paywall')} />
+        </View>
+      )}
       <Text style={[stiller.aciklama, { color: r.soluk }]}>
         Yörenizin kurallarına göre birim puanları değiştirin. Cezaları eksi (−) girin.
         Değişiklik yeni masalara uygulanır; devam eden masanın puanları kilitlidir.
@@ -65,6 +62,7 @@ export default function PuanTablosuEkrani() {
             </View>
             <TextInput
               value={String(deger)}
+              editable={proMu}
               onChangeText={(metin) => {
                 const sayi = parseInt(metin, 10);
                 if (!Number.isNaN(sayi)) puanGuncelle(alan, sayi);
@@ -74,14 +72,25 @@ export default function PuanTablosuEkrani() {
               maxLength={6}
               style={[
                 stiller.girdi,
-                { backgroundColor: r.zeminKoyu, color: deger > 0 ? r.yesil : r.kirmizi, borderColor: r.cizgi },
+                {
+                  backgroundColor: r.zeminKoyu,
+                  color: deger > 0 ? r.yesil : r.kirmizi,
+                  borderColor: r.cizgi,
+                  opacity: proMu ? 1 : 0.5,
+                },
               ]}
             />
           </View>
         );
       })}
 
-      <Buton baslik="Varsayılana Dön" tur="ikincil" onPress={varsayilanaDon} stil={stiller.aralik} />
+      <Buton
+        baslik="Varsayılana Dön"
+        tur="ikincil"
+        pasif={!proMu}
+        onPress={varsayilanaDon}
+        stil={stiller.aralik}
+      />
     </ScrollView>
   );
 }
@@ -110,7 +119,6 @@ const stiller = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   aralik: { marginTop: 20 },
-  kilit: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 },
-  kilitEmoji: { fontSize: 64 },
-  kilitMetin: { fontSize: 16, textAlign: 'center' },
+  kilitBandi: { borderWidth: 2, borderRadius: 14, padding: 14, marginBottom: 12, gap: 10 },
+  kilitMetin: { fontSize: 15, fontWeight: '800', textAlign: 'center' },
 });

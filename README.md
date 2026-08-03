@@ -5,7 +5,8 @@
 - **Sunucu yok** — tüm veri cihazda (MMKV), uçak modunda %100 çalışır
 - **Reklam yok, analytics yok, izin istemez**
 - Sadece Türkçe, para birimi ₺
-- Premium: **yıllık (king_yillik)** ve **ömür boyu (king_omurboyu)** — aylık abonelik yok
+- Tek ürün: **`king_pro_lifetime`** (non-consumable, 199 ₺) — **abonelik YOK**
+- Ücretsiz sınır: **günde 1 masa** (yerel gün başlangıcında sıfırlanır; masa ortasında asla kilit yok)
 
 ## Teknoloji
 
@@ -71,14 +72,15 @@ src/
   core/                  # SAF skor motoru — React'ten bağımsız
     tipler.ts            # OyunTuru, El, Masa, PuanTablosu...
     sabitler.ts          # varsayılan puanlar, hedef birimler, adlar
-    skor.ts              # puanHesapla, elDogrula, kalanHaklar,
-                         # toplamSkorlar, sonucBelirle, secilebilirOyunlar
-    __tests__/skor.test.ts
+    skor.ts              # puanHesapla, elDogrula, kalanHaklar, toplamSkorlar,
+                         # sonucBelirle, secilebilirOyunlar, genelIstatistikler
+    gunlukSinir.ts       # günde 1 masa sınırı + saat istismarı koruması
+    __tests__/           # skor.test.ts + gunlukSinir.test.ts (50 test)
   store/                 # zustand + MMKV persist
     depo.ts              # MMKV örneği + StateStorage adaptörü
-    masaStore.ts         # aktif masa, geçmiş, el CRUD, rövanş
+    masaStore.ts         # aktif masa, geçmiş, el CRUD, rövanş, günlük hak
     ayarStore.ts         # sesler/animasyonlar/King kuralı/puan taslağı/tema
-    premiumStore.ts      # usePremium() — offline cache'li entitlement
+    proStore.ts          # usePro() — offline cache'li `pro` entitlement
   servisler/
     satinalma.ts         # RevenueCat sarmalayıcısı
     ses.ts, titresim.ts, paylas.ts, yedekleme.ts
@@ -99,6 +101,22 @@ assets/sesler/           # sentezlenmiş telifsiz WAV efektleri
 - Puan tablosu **Ayarlar → Puan Tablosu**'ndan düzenlenebilir; masa kurulurken
   o anki tablo masaya kopyalanıp kilitlenir.
 
+## Para kazanma modeli
+
+- **Tek ürün:** `king_pro_lifetime` — non-consumable (kalıcı satın alım), 199 ₺.
+  Otomatik yenilenen abonelik YOK; yıllık/aylık ürün YOK.
+- **Ücretsiz sınır: günde 1 masa.** Ücretsiz kullanıcı her gün 1 masa başlatır ve
+  20 elin tamamını, sonuç ekranını ve tüm animasyonları görür — deneyim kırpılmaz.
+  Sınır cihazın yerel gün başlangıcında (00:00) sıfırlanır. Kaydedilen son masa günü
+  gelecekteyse (kullanıcı saati geri almışsa) sınır sıfırlanmaz; gerçek zaman o günü
+  geçince kendiliğinden açılır, kimse kalıcı kilitlenmez (`src/core/gunlukSinir.ts`,
+  testli). Başlamış masa **hiçbir koşulda** kilitlenmez.
+- **Pro ile açılanlar:** sınırsız masa, geçmiş masalar + oyuncu istatistikleri
+  (en çok rıfkı yiyen, en çok King yapan, ortalamalar), puan tablosu özelleştirme,
+  filigransız paylaşım, ekstra masa temaları (ahşap / gece mavisi). Ücretsiz sürümde
+  bu ekranlar görünür ama 🔒 rozetiyle kilitlidir.
+- Paywall'da karanlık desen yok: sahte indirim/geri sayım yok, sağ üstte X ile kapatılır.
+
 ## RevenueCat & mağaza kurulumu
 
 Kod tarafında yapılacak tek şey: `src/servisler/satinalma.ts` içindeki
@@ -107,32 +125,38 @@ Kod tarafında yapılacak tek şey: `src/servisler/satinalma.ts` içindeki
 
 ### 1. App Store Connect
 
-1. **Ayarlar → Abonelikler**: yeni abonelik grubu "King Skor Pro" oluşturun.
-2. Grup içinde ürün: **`king_yillik`** — Auto-Renewable Subscription, süre **1 yıl**,
-   fiyat **99 ₺** (Türkiye vitrini). Aylık ürün OLUŞTURMAYIN.
-3. **Uygulama İçi Satın Alımlar**: **`king_omurboyu`** — Non-Consumable, fiyat **199 ₺**.
-4. Her iki ürüne Türkçe görünen ad/açıklama girin.
+1. **Uygulama İçi Satın Alımlar → Oluştur**: **`king_pro_lifetime`** —
+   tür **Non-Consumable**, fiyat **199 ₺** (Türkiye vitrini).
+   Abonelik grubu OLUŞTURMAYIN; başka ürün eklemeyin.
+2. Türkçe görünen ad ("King Skor Pro — Ömür Boyu") ve açıklama girin.
+3. Uygulama açıklamasının **en altına** Apple'ın standart EULA linkini ekleyin:
+   `Kullanım Koşulları: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`
+4. **Small Business Program**'a kayıt olun → komisyon %30 yerine **%15**.
+   Net hesap: 199 ₺ (KDV dahil) → %20 KDV düşünce ~165,8 ₺ → %15 komisyon düşünce
+   geliştiriciye kalan yaklaşık **141 ₺**.
+5. **Review notlarına** şunu yazın: "Uygulama tamamen çevrimdışıdır, hesap gerektirmez,
+   veri toplamaz. Test için: ana ekran > Yeni Masa > 4 isim gir > El Gir."
+6. Yaş sınırı **4+**; kumar/bahis içeriği YOK — bu bir skor defteridir, oyun oynatmaz.
+   Bunu açıklama metninde de belirtin.
 
 ### 2. Google Play Console
 
-1. **Para kazanma → Abonelikler**: `king_yillik`, temel plan 1 yıl, 99 ₺.
-2. **Ürünler → Uygulama içi ürünler**: `king_omurboyu`, tek seferlik, 199 ₺.
+**Ürünler → Uygulama içi ürünler**: `king_pro_lifetime`, tek seferlik, 199 ₺.
 
 ### 3. RevenueCat panosu
 
 1. Proje oluşturun, iOS ve Android uygulamalarını bağlayın
    (bundle id: `com.kingskor.app`).
 2. **Entitlements**: `pro` adında entitlement oluşturun.
-3. **Products**: mağazalardan `king_yillik` ve `king_omurboyu` ürünlerini içe aktarın,
-   ikisini de `pro` entitlement'ına bağlayın.
-4. **Offerings**: `default` offering'e iki paketi ekleyin
-   (Annual → king_yillik, Lifetime → king_omurboyu).
+3. **Products**: mağazalardan `king_pro_lifetime` ürününü içe aktarın ve
+   `pro` entitlement'ına bağlayın.
+4. **Offerings**: `default` offering'e Lifetime paketi olarak ekleyin.
 5. **API Keys** sayfasındaki `appl_...` ve `goog_...` public anahtarlarını
    `satinalma.ts`'e yazın.
 
-Fiyatlar uygulamada `product.priceString` ile **mağazadan dinamik** okunur;
-kodda sabit fiyat yoktur. Offline durumda son bilinen premium durumu MMKV'den okunur,
-premium kullanıcı internet yok diye kilitlenmez.
+Fiyat uygulamada `product.priceString` ile **mağazadan dinamik** okunur; kodda sabit
+fiyat yoktur. Offline durumda son bilinen Pro durumu MMKV'den okunur (`usePro()`);
+Pro kullanıcı internet yok diye ASLA kilitlenmez.
 
 ## Build alma
 
@@ -150,9 +174,10 @@ eas submit --platform ios
 eas submit --platform android
 ```
 
-Apple incelemesi için: paywall'da "Satın Alımları Geri Yükle" butonu, otomatik yenileme
-açıklaması, Gizlilik Politikası ve EULA bağlantıları hazırdır. Gizlilik beyanında
-"veri toplanmıyor" işaretleyebilirsiniz (tek istisna: mağaza satın alma doğrulaması).
+Apple incelemesi için: paywall'da "Satın Alımları Geri Yükle" butonu, "abonelik yok,
+yenileme yok" ifadesi, Gizlilik Politikası ve EULA bağlantıları ile kolay kapatılan X
+hazırdır. Gizlilik beyanında "veri toplanmıyor" işaretleyebilirsiniz
+(tek istisna: mağaza satın alma doğrulaması).
 
 ## Yedekleme
 

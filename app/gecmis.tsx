@@ -1,13 +1,14 @@
-// Geçmiş masalar (premium): liste + JSON dışa/içe aktarma.
+// Geçmiş masalar + oyuncu istatistikleri (Pro). Ücretsiz kullanıcı ekranı görür
+// ama içerik kilit rozetiyle kapalıdır — ne alacağını bilsin.
 
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
-import { toplamSkorlar } from '@/core/skor';
+import { genelIstatistikler, toplamSkorlar } from '@/core/skor';
 import { disaAktar, iceAktar } from '@/servisler/yedekleme';
 import { useMasaStore } from '@/store/masaStore';
-import { usePremium } from '@/store/premiumStore';
+import { usePro } from '@/store/proStore';
 import { useRenkler } from '@/tema/renkler';
 
 export default function GecmisEkrani() {
@@ -15,20 +16,12 @@ export default function GecmisEkrani() {
   const r = useRenkler();
   const gecmis = useMasaStore((d) => d.gecmis);
   const gecmistenSil = useMasaStore((d) => d.gecmistenSil);
-  const premiumMu = usePremium();
+  const proMu = usePro();
 
-  if (!premiumMu) {
-    // Premium değilse nazikçe paywall'a yönlendir
-    return (
-      <View style={[stiller.kilit, { backgroundColor: r.zemin }]}>
-        <Text style={stiller.kilitEmoji}>🔒</Text>
-        <Text style={[stiller.kilitMetin, { color: r.metin }]}>
-          Geçmiş masalar ve istatistikler King Skor Pro ile açılır.
-        </Text>
-        <Buton baslik="Pro'yu İncele" onPress={() => router.push('/paywall')} />
-      </View>
-    );
-  }
+  const istatistik = useMemo(
+    () => (proMu && gecmis.length > 0 ? genelIstatistikler(gecmis) : null),
+    [proMu, gecmis],
+  );
 
   const iceAl = async () => {
     const sonuc = await iceAktar();
@@ -42,6 +35,48 @@ export default function GecmisEkrani() {
         data={gecmis}
         keyExtractor={(m) => m.id}
         contentContainerStyle={stiller.liste}
+        ListHeaderComponent={
+          <>
+            {!proMu && (
+              <Pressable
+                onPress={() => router.push('/paywall')}
+                style={[stiller.kilitBandi, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}
+              >
+                <Text style={[stiller.kilitBaslik, { color: r.altin }]}>
+                  🔒 Geçmiş masalar ve istatistikler Pro ile açılır
+                </Text>
+                <Text style={[stiller.kilitAlt, { color: r.soluk }]}>
+                  En çok rıfkı yiyen · en çok King yapan · oyuncu ortalamaları
+                </Text>
+              </Pressable>
+            )}
+            {istatistik && (
+              <View style={[stiller.istKutusu, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}>
+                <Text style={[stiller.istBaslik, { color: r.altin }]}>
+                  Genel İstatistikler ({istatistik.masaSayisi} masa)
+                </Text>
+                {istatistik.enCokRifkiYiyen && (
+                  <Text style={[stiller.ist, { color: r.metin }]}>
+                    ♥K En çok rıfkı yiyen: {istatistik.enCokRifkiYiyen.ad} (
+                    {istatistik.enCokRifkiYiyen.adet} kez)
+                  </Text>
+                )}
+                {istatistik.enCokKingYapan && (
+                  <Text style={[stiller.ist, { color: r.metin }]}>
+                    👑 En çok King yapan: {istatistik.enCokKingYapan.ad} (
+                    {istatistik.enCokKingYapan.adet} kez)
+                  </Text>
+                )}
+                {istatistik.oyuncuOrtalamalari.slice(0, 6).map((o) => (
+                  <Text key={o.ad} style={[stiller.ist, { color: r.soluk }]}>
+                    {o.ad}: masa başına {o.ortalama > 0 ? '+' : ''}
+                    {o.ortalama} puan ({o.masaSayisi} masa)
+                  </Text>
+                ))}
+              </View>
+            )}
+          </>
+        }
         ListEmptyComponent={
           <Text style={[stiller.bos, { color: r.soluk }]}>
             Henüz bitmiş masa yok. İlk masanızı oynayın!
@@ -59,21 +94,29 @@ export default function GecmisEkrani() {
           });
           return (
             <Pressable
-              onPress={() => router.push({ pathname: '/gecmis-detay', params: { id: item.id } })}
+              onPress={() =>
+                proMu
+                  ? router.push({ pathname: '/gecmis-detay', params: { id: item.id } })
+                  : router.push('/paywall')
+              }
               onLongPress={() =>
                 Alert.alert('Masayı sil', 'Bu masa geçmişten silinsin mi?', [
                   { text: 'Vazgeç', style: 'cancel' },
                   { text: 'Sil', style: 'destructive', onPress: () => gecmistenSil(item.id) },
                 ])
               }
-              style={[stiller.kart, { backgroundColor: r.zeminKoyu, borderColor: r.cizgi }]}
+              style={[
+                stiller.kart,
+                { backgroundColor: r.zeminKoyu, borderColor: r.cizgi, opacity: proMu ? 1 : 0.6 },
+              ]}
             >
               <Text style={[stiller.kartBaslik, { color: r.metin }]}>
-                {item.ad || tarih}
+                {proMu ? item.ad || tarih : `🔒 ${item.ad || tarih}`}
               </Text>
               <Text style={[stiller.kartAlt, { color: r.soluk }]} numberOfLines={1}>
-                👑 {kazanan.ad} ({(toplamlar[kazanan.id] ?? 0) > 0 ? '+' : ''}
-                {toplamlar[kazanan.id] ?? 0}) · {item.eller.length} el · {tarih}
+                {proMu
+                  ? `👑 ${kazanan.ad} (${(toplamlar[kazanan.id] ?? 0) > 0 ? '+' : ''}${toplamlar[kazanan.id] ?? 0}) · ${item.eller.length} el · ${tarih}`
+                  : 'Detay için Pro gerekli'}
               </Text>
             </Pressable>
           );
@@ -89,14 +132,17 @@ export default function GecmisEkrani() {
 
 const stiller = StyleSheet.create({
   govde: { flex: 1 },
-  liste: { padding: 16, gap: 10 },
+  liste: { padding: 16 },
+  kilitBandi: { borderWidth: 2, borderRadius: 14, padding: 14, marginBottom: 12 },
+  kilitBaslik: { fontSize: 15, fontWeight: '800' },
+  kilitAlt: { fontSize: 13, marginTop: 4 },
+  istKutusu: { borderWidth: 2, borderRadius: 14, padding: 14, marginBottom: 12, gap: 4 },
+  istBaslik: { fontSize: 15, fontWeight: '900', marginBottom: 4 },
+  ist: { fontSize: 14, fontWeight: '600' },
   bos: { textAlign: 'center', marginTop: 48, fontSize: 15 },
   kart: { borderRadius: 14, borderWidth: 1, padding: 14, marginBottom: 10 },
   kartBaslik: { fontSize: 17, fontWeight: '800' },
   kartAlt: { fontSize: 13, marginTop: 4 },
   altAlan: { padding: 16 },
   aralik: { marginTop: 8 },
-  kilit: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 },
-  kilitEmoji: { fontSize: 64 },
-  kilitMetin: { fontSize: 16, textAlign: 'center' },
 });

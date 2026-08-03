@@ -15,13 +15,15 @@ import { Buton } from '@/bilesenler/Buton';
 import { OYUNCU_EMOJILERI } from '@/core/sabitler';
 import type { Oyuncu } from '@/core/tipler';
 import { kimlikUret } from '@/store/depo';
-import { useMasaStore } from '@/store/masaStore';
+import { useMasaStore, yeniMasaHakkiVarMi } from '@/store/masaStore';
+import { usePro } from '@/store/proStore';
 import { useRenkler } from '@/tema/renkler';
 
 export default function OyuncularEkrani() {
   const router = useRouter();
   const r = useRenkler();
   const { masaKur, sonOyuncular, aktifMasa } = useMasaStore();
+  const proMu = usePro();
 
   const [adlar, setAdlar] = useState<string[]>(['', '', '', '']);
   const [emojiler, setEmojiler] = useState<string[]>(
@@ -31,6 +33,11 @@ export default function OyuncularEkrani() {
   const [acikEmojiSecici, setAcikEmojiSecici] = useState<number | null>(null);
 
   const baslat = (oyuncular: [Oyuncu, Oyuncu, Oyuncu, Oyuncu], ad?: string) => {
+    if (!yeniMasaHakkiVarMi(proMu)) {
+      // Günlük ücretsiz hak dolmuş; nazikçe paywall'a yönlendir
+      router.push('/paywall');
+      return;
+    }
     if (aktifMasa) {
       Alert.alert(
         'Devam eden masa var',

@@ -3,8 +3,9 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { gunAnahtari, masaBaslatabilirMi } from '@/core/gunlukSinir';
 import { TOPLAM_EL_SAYISI } from '@/core/sabitler';
-import { kingMi, oyunBittiMi, puanHesapla } from '@/core/skor';
+import { kingMi, puanHesapla } from '@/core/skor';
 import type { El, Koz, Masa, Oyuncu, OyunTuru } from '@/core/tipler';
 import { useAyarStore } from './ayarStore';
 import { kimlikUret, mmkvDepo } from './depo';
@@ -20,8 +21,7 @@ interface MasaDurumu {
   aktifMasa: Masa | null;
   gecmis: Masa[];
   sonOyuncular: Oyuncu[] | null; // "Aynı ekiple başla" için
-  tamamlananMasaSayisi: number;
-  paywallGosterildi: boolean; // 3. masa sonrası tek seferlik nazik paywall
+  sonMasaGunu: string | null; // günlük ücretsiz sınır için ("2026-08-03")
 
   masaKur: (oyuncular: [Oyuncu, Oyuncu, Oyuncu, Oyuncu], ad?: string) => void;
   elKaydet: (girdi: ElGirdisi) => El;
@@ -32,7 +32,6 @@ interface MasaDurumu {
   masayiSil: () => void; // aktif masayı tamamen iptal et
   gecmistenSil: (masaId: string) => void;
   gecmisiIceAktar: (masalar: Masa[]) => void;
-  paywallGoruldu: () => void;
 }
 
 export const useMasaStore = create<MasaDurumu>()(
@@ -41,8 +40,7 @@ export const useMasaStore = create<MasaDurumu>()(
       aktifMasa: null,
       gecmis: [],
       sonOyuncular: null,
-      tamamlananMasaSayisi: 0,
-      paywallGosterildi: false,
+      sonMasaGunu: null,
 
       masaKur: (oyuncular, ad) => {
         // O anki puan tablosu masaya kopyalanır ve kilitlenir
@@ -55,7 +53,13 @@ export const useMasaStore = create<MasaDurumu>()(
           eller: [],
           baslangic: Date.now(),
         };
-        set({ aktifMasa: masa, sonOyuncular: oyuncular });
+        set({
+          aktifMasa: masa,
+          sonOyuncular: oyuncular,
+          // Günlük ücretsiz sınır takibi: en son görülen günü ileri taşı,
+          // saat geri alındıysa geriye düşürme
+          sonMasaGunu: [get().sonMasaGunu ?? '', gunAnahtari(Date.now())].sort().pop() ?? null,
+        });
       },
 
       elKaydet: (girdi) => {
@@ -119,11 +123,9 @@ export const useMasaStore = create<MasaDurumu>()(
         const masa = get().aktifMasa;
         if (!masa) return;
         const bitmis: Masa = { ...masa, bitis: masa.bitis ?? Date.now() };
-        const tamamlandi = oyunBittiMi(bitmis) || bitmis.bitis !== undefined;
         set((d) => ({
           aktifMasa: null,
           gecmis: [bitmis, ...d.gecmis],
-          tamamlananMasaSayisi: d.tamamlananMasaSayisi + (tamamlandi ? 1 : 0),
         }));
       },
 
@@ -139,8 +141,6 @@ export const useMasaStore = create<MasaDurumu>()(
           const yeniler = masalar.filter((m) => !mevcut.has(m.id));
           return { gecmis: [...yeniler, ...d.gecmis] };
         }),
-
-      paywallGoruldu: () => set({ paywallGosterildi: true }),
     }),
     {
       name: 'king-skor-masa',
@@ -148,3 +148,12 @@ export const useMasaStore = create<MasaDurumu>()(
     },
   ),
 );
+
+/**
+ * Yeni masa başlatma hakkı (olay anında çağrılır, render içinde değil).
+ * Pro: sınırsız. Ücretsiz: günde 1 masa; başlamış masa asla kilitlenmez.
+ */
+export function yeniMasaHakkiVarMi(proMu: boolean): boolean {
+  if (proMu) return true;
+  return masaBaslatabilirMi(useMasaStore.getState().sonMasaGunu, Date.now());
+}

@@ -6,7 +6,7 @@ import { VARSAYILAN_PUAN_TABLOSU } from '@/core/sabitler';
 import type { PuanTablosu } from '@/core/tipler';
 import { mmkvDepo } from './depo';
 
-export type Tema = 'koyu' | 'acik';
+export type Tema = 'cuha' | 'ahsap' | 'gece';
 
 interface AyarDurumu {
   sesler: boolean;
@@ -29,7 +29,7 @@ export const useAyarStore = create<AyarDurumu>()(
       sesler: true,
       animasyonlar: true,
       kingdeBiter: false,
-      tema: 'koyu',
+      tema: 'cuha',
       puanTablosu: { ...VARSAYILAN_PUAN_TABLOSU },
 
       seslerAc: (acik) => set({ sesler: acik }),

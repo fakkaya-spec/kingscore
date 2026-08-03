@@ -6,6 +6,8 @@
 - Kod, yorumlar ve arayüz **Türkçe**dir; İngilizce string ekleme.
 - Skor motoru `src/core/` altında **saf fonksiyonlardır**; React'e bağımlılık ekleme.
 - Altın kural: oyun sonunda 4 oyuncunun puan toplamı 0 olmalıdır — motoru değiştirirken
-  `npm test` (39 test) geçmeden bırakma.
+  `npm test` geçmeden bırakma.
 - Kontroller: `npm test`, `npm run typecheck`, `npm run lint`.
-- Yasaklar: backend/auth/analytics/reklam yok; aylık abonelik yok; i18n katmanı yok.
+- Para kazanma: tek ürün `king_pro_lifetime` (non-consumable); ücretsizde günde 1 masa.
+  Başlamış masa asla kilitlenmez; abonelik ürünü ekleme.
+- Yasaklar: backend/auth/analytics/reklam yok; abonelik yok; i18n katmanı yok.

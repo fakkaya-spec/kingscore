@@ -2,12 +2,10 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { satinAlmayiBaslat } from '@/servisler/satinalma';
-import { useAyarStore } from '@/store/ayarStore';
 import { useRenkler } from '@/tema/renkler';
 
 export default function KokYerlesim() {
   const r = useRenkler();
-  const tema = useAyarStore((d) => d.tema);
 
   useEffect(() => {
     // Mağaza SDK'sı arka planda başlar; internet yoksa MMKV'deki durum geçerli kalır
@@ -16,7 +14,8 @@ export default function KokYerlesim() {
 
   return (
     <>
-      <StatusBar style={tema === 'koyu' ? 'light' : 'dark'} />
+      {/* Tüm masa temaları koyudur */}
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: r.zeminKoyu },

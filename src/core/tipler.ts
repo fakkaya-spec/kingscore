@@ -91,3 +91,11 @@ export interface MasaSonucu {
   toplamSifir: boolean; // altın doğrulama kuralı
   istatistikler: MasaIstatistikleri;
 }
+
+/** Geçmiş masaların tamamı üzerinden oyuncu-adı bazlı istatistikler (Pro). */
+export interface GenelIstatistikler {
+  masaSayisi: number;
+  enCokRifkiYiyen?: { ad: string; adet: number };
+  enCokKingYapan?: { ad: string; adet: number };
+  oyuncuOrtalamalari: { ad: string; ortalama: number; masaSayisi: number }[];
+}

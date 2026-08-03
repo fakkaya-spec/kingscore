@@ -4,6 +4,7 @@ import { CEZA_TURLERI, VARSAYILAN_PUAN_TABLOSU } from '../sabitler';
 import {
   cezaKullanimlari,
   elDogrula,
+  genelIstatistikler,
   kalanHaklar,
   kingMi,
   kingYapanOyuncu,
@@ -386,5 +387,45 @@ describe('sonucBelirle', () => {
   test('tam oyunun sonucunda toplamSifir true döner (altın kural)', () => {
     const sonuc = sonucBelirle(tamOyunYap());
     expect(sonuc.toplamSifir).toBe(true);
+  });
+});
+
+// ---------- genel istatistikler (Pro) ----------
+
+describe('genelIstatistikler', () => {
+  test('boş geçmişte güvenli boş sonuç döner', () => {
+    const g = genelIstatistikler([]);
+    expect(g.masaSayisi).toBe(0);
+    expect(g.enCokRifkiYiyen).toBeUndefined();
+    expect(g.enCokKingYapan).toBeUndefined();
+    expect(g.oyuncuOrtalamalari).toEqual([]);
+  });
+
+  test('rıfkı ve King sayıları oyuncu ADI üzerinden masalar arası toplanır', () => {
+    // Aynı isimler farklı masalarda farklı id alır; ad bazlı gruplanmalı
+    const masa1 = masaYap([
+      elYap('RIFKI', { o1: 1, o2: 0, o3: 0, o4: 0 }, 'o2'),
+      elYap('KOZ', { o1: 13, o2: 0, o3: 0, o4: 0 }, 'o1', 'MACA'), // Ali King
+    ]);
+    const masa2 = masaYap([
+      elYap('RIFKI', { o1: 1, o2: 0, o3: 0, o4: 0 }, 'o3'),
+      elYap('KOZ', { o1: 0, o2: 12, o3: 1, o4: 0 }, 'o2', 'KUPA'), // Ayşe King
+    ]);
+    const g = genelIstatistikler([masa1, masa2]);
+    expect(g.masaSayisi).toBe(2);
+    expect(g.enCokRifkiYiyen).toEqual({ ad: 'Ali', adet: 2 });
+    expect(g.enCokKingYapan!.adet).toBe(1); // Ali ve Ayşe 1'er kez; en büyük 1
+  });
+
+  test('oyuncu ortalamaları masa başına hesaplanır ve büyükten küçüğe sıralanır', () => {
+    const masa1 = masaYap([elYap('KOZ', { o1: 13, o2: 0, o3: 0, o4: 0 }, 'o1', 'MACA')]); // Ali +650
+    const masa2 = masaYap([elYap('RIFKI', { o1: 1, o2: 0, o3: 0, o4: 0 }, 'o1')]); // Ali -320
+    const g = genelIstatistikler([masa1, masa2]);
+    const ali = g.oyuncuOrtalamalari.find((o) => o.ad === 'Ali')!;
+    expect(ali.masaSayisi).toBe(2);
+    expect(ali.ortalama).toBe(Math.round((650 - 320) / 2));
+    expect(g.oyuncuOrtalamalari[0].ortalama).toBeGreaterThanOrEqual(
+      g.oyuncuOrtalamalari[g.oyuncuOrtalamalari.length - 1].ortalama,
+    );
   });
 });

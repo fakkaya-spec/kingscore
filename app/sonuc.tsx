@@ -21,8 +21,8 @@ import type { Oyuncu, SonucDurumu } from '@/core/tipler';
 import { goruntuyuPaylas } from '@/servisler/paylas';
 import { sesCal } from '@/servisler/ses';
 import { kimlikUret } from '@/store/depo';
-import { useMasaStore } from '@/store/masaStore';
-import { usePremium } from '@/store/premiumStore';
+import { useMasaStore, yeniMasaHakkiVarMi } from '@/store/masaStore';
+import { usePro } from '@/store/proStore';
 import { useAyarStore } from '@/store/ayarStore';
 import { useRenkler } from '@/tema/renkler';
 
@@ -69,14 +69,8 @@ export default function SonucEkrani() {
   const router = useRouter();
   const r = useRenkler();
   const masa = useMasaStore((d) => d.aktifMasa);
-  const {
-    masayiKapat,
-    masaKur,
-    tamamlananMasaSayisi,
-    paywallGosterildi,
-    paywallGoruldu,
-  } = useMasaStore();
-  const premiumMu = usePremium();
+  const { masayiKapat, masaKur } = useMasaStore();
+  const proMu = usePro();
   const animasyonlarAcik = useAyarStore((d) => d.animasyonlar);
   const paylasilanRef = useRef<View>(null);
 
@@ -107,9 +101,14 @@ export default function SonucEkrani() {
 
   const kapatVeGit = (hedef: 'ana' | 'rovans') => {
     const oyuncular = masa.oyuncular;
-    masayiKapat();
 
     if (hedef === 'rovans') {
+      // Rövanş da yeni bir masadır: günlük ücretsiz sınıra tabidir
+      if (!yeniMasaHakkiVarMi(proMu)) {
+        router.push('/paywall');
+        return;
+      }
+      masayiKapat();
       const yeniOyuncular = oyuncular.map((o: Oyuncu) => ({ ...o, id: kimlikUret() })) as [
         Oyuncu,
         Oyuncu,
@@ -121,13 +120,7 @@ export default function SonucEkrani() {
       return;
     }
 
-    // 3. masa bittiğinde tek seferlik nazik paywall (kapatılabilir, ısrar yok)
-    const yeniSayi = tamamlananMasaSayisi + 1;
-    if (!premiumMu && !paywallGosterildi && yeniSayi >= 3) {
-      paywallGoruldu();
-      router.replace('/paywall');
-      return;
-    }
+    masayiKapat();
     router.replace('/');
   };
 
@@ -223,7 +216,7 @@ export default function SonucEkrani() {
             <SkorTablosu masa={masa} hakGoster={false} />
           </View>
 
-          {!premiumMu && (
+          {!proMu && (
             <Text style={[stiller.filigran, { color: r.soluk }]}>King Skor ile tutuldu ♠</Text>
           )}
         </View>

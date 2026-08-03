@@ -15,6 +15,7 @@ import {
 import type {
   DogrulamaSonucu,
   El,
+  GenelIstatistikler,
   KalanHak,
   Masa,
   MasaIstatistikleri,
@@ -281,5 +282,66 @@ export function sonucBelirle(masa: Masa): MasaSonucu {
     durum,
     toplamSifir: toplamSifirMi(masa),
     istatistikler: istatistikleriHesapla(masa),
+  };
+}
+
+/**
+ * Geçmiş masaların tamamı üzerinden oyuncu-ADI bazlı istatistikler (Pro özelliği).
+ * Aynı isim farklı masalarda farklı id alır; bu yüzden ad üzerinden gruplanır.
+ */
+export function genelIstatistikler(masalar: Masa[]): GenelIstatistikler {
+  const rifkiler: Record<string, number> = {};
+  const kingler: Record<string, number> = {};
+  const toplamlarAdBazli: Record<string, { toplam: number; masaSayisi: number }> = {};
+
+  for (const masa of masalar) {
+    const toplamlar = toplamSkorlar(masa);
+    const adMap = new Map(masa.oyuncular.map((o) => [o.id, o.ad]));
+
+    for (const oyuncu of masa.oyuncular) {
+      const kayit = toplamlarAdBazli[oyuncu.ad] ?? { toplam: 0, masaSayisi: 0 };
+      kayit.toplam += toplamlar[oyuncu.id] ?? 0;
+      kayit.masaSayisi += 1;
+      toplamlarAdBazli[oyuncu.ad] = kayit;
+    }
+
+    for (const el of masa.eller) {
+      if (el.tur === 'RIFKI') {
+        for (const [id, adet] of Object.entries(el.adetler)) {
+          const ad = adMap.get(id);
+          if (ad && adet > 0) rifkiler[ad] = (rifkiler[ad] ?? 0) + adet;
+        }
+      }
+      const kralId = kingYapanOyuncu(el);
+      const kralAd = kralId ? adMap.get(kralId) : undefined;
+      if (kralAd) kingler[kralAd] = (kingler[kralAd] ?? 0) + 1;
+    }
+  }
+
+  const enBuyuk = (kayitlar: Record<string, number>) => {
+    let iyiAd: string | undefined;
+    let iyiDeger = 0;
+    for (const [ad, deger] of Object.entries(kayitlar)) {
+      if (deger > iyiDeger) {
+        iyiDeger = deger;
+        iyiAd = ad;
+      }
+    }
+    return iyiAd ? { ad: iyiAd, adet: iyiDeger } : undefined;
+  };
+
+  const oyuncuOrtalamalari = Object.entries(toplamlarAdBazli)
+    .map(([ad, k]) => ({
+      ad,
+      ortalama: Math.round(k.toplam / k.masaSayisi),
+      masaSayisi: k.masaSayisi,
+    }))
+    .sort((a, b) => b.ortalama - a.ortalama);
+
+  return {
+    masaSayisi: masalar.length,
+    enCokRifkiYiyen: enBuyuk(rifkiler),
+    enCokKingYapan: enBuyuk(kingler),
+    oyuncuOrtalamalari,
   };
 }
