@@ -16,6 +16,7 @@ import {
 import { Buton } from '@/bilesenler/Buton';
 import { OYUNCU_EMOJILERI } from '@/core/sabitler';
 import type { Oyuncu } from '@/core/tipler';
+import { davetPaylas } from '@/servisler/paylas';
 import { hafifTitret } from '@/servisler/titresim';
 import { kimlikUret } from '@/store/depo';
 import { useMasaStore, yeniMasaHakkiVarMi } from '@/store/masaStore';
@@ -364,6 +365,8 @@ export default function OyuncularEkrani() {
           onPress={hizliBaslat}
         />
       )}
+
+      <Buton baslik="Arkadaşını Davet Et" tur="ikincil" onPress={() => davetPaylas()} />
 
       {/* Uzun basma menüsündeki simgelerin ekran okuyucuda karşılığı */}
       <View style={stiller.altNot}>
