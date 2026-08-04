@@ -33,7 +33,8 @@ export function Buton({ baslik, onPress, tur = 'birincil', buyuk, pasif, stil }:
           backgroundColor: pasif ? r.pasif : zemin,
           borderColor: tur === 'ikincil' ? r.cizgi : 'transparent',
           borderWidth: tur === 'ikincil' ? 1 : 0,
-          opacity: pressed ? 0.85 : 1,
+          opacity: pressed ? 0.9 : 1,
+          transform: [{ scale: pressed ? 0.97 : 1 }],
         },
       ]}
     >

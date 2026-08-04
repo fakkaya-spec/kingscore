@@ -25,7 +25,13 @@ export const useProStore = create<ProDurumu>()(
   ),
 );
 
+// Test build'lerinde Pro'yu açan derleme zamanı bayrağı. Yalnızca eas.json'daki
+// preview/simulator profilleri EXPO_PUBLIC_TEST_PRO=1 gönderir; production
+// profili göndermez, mağaza build'i her zaman gerçek satın alıma bakar.
+const TEST_PRO = process.env.EXPO_PUBLIC_TEST_PRO === '1';
+
 /** Ekranlarda kullanılacak kısayol hook'u: RevenueCat `pro` entitlement'ı. */
 export function usePro(): boolean {
-  return useProStore((d) => d.proMu);
+  const proMu = useProStore((d) => d.proMu);
+  return TEST_PRO || proMu;
 }

@@ -13,12 +13,14 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Buton } from '@/bilesenler/Buton';
 import { OYUNCU_EMOJILERI } from '@/core/sabitler';
 import type { Oyuncu } from '@/core/tipler';
 import { davetPaylas } from '@/servisler/paylas';
 import { hafifTitret } from '@/servisler/titresim';
 import { kimlikUret } from '@/store/depo';
+import { useAyarStore } from '@/store/ayarStore';
 import { useMasaStore, yeniMasaHakkiVarMi } from '@/store/masaStore';
 import { useOyuncuHavuzuStore, type HavuzOyuncusu } from '@/store/oyuncuHavuzuStore';
 import { usePro } from '@/store/proStore';
@@ -30,6 +32,7 @@ export default function OyuncularEkrani() {
   const { masaKur, aktifMasa } = useMasaStore();
   const { havuz, havuzaEkle, havuzdaGuncelle, havuzdanSil } = useOyuncuHavuzuStore();
   const proMu = usePro();
+  const animasyonlar = useAyarStore((d) => d.animasyonlar);
 
   // Havuzdan seçim: dizideki sıra masadaki oturma sırasıdır
   const [seciliIdler, setSeciliIdler] = useState<string[]>([]);
@@ -180,12 +183,18 @@ export default function OyuncularEkrani() {
             Masaya oturacak 4 kişiye sırayla dokun. Uzun basınca düzenlersin.
           </Text>
           <View style={stiller.havuzAlani}>
-            {havuz.map((oyuncu) => {
+            {havuz.map((oyuncu, i) => {
               const siraNo = seciliIdler.indexOf(oyuncu.id);
               const secili = siraNo >= 0;
               return (
-                <Pressable
+                <Animated.View
                   key={oyuncu.id}
+                  entering={
+                    animasyonlar ? FadeInDown.delay(i * 45).springify().damping(15) : undefined
+                  }
+                  style={stiller.kartSarici}
+                >
+                <Pressable
                   accessibilityLabel={
                     secili
                       ? `${oyuncu.ad} seçili, sıra ${siraNo + 1}. Kaldırmak için dokun`
@@ -210,22 +219,35 @@ export default function OyuncularEkrani() {
                     {oyuncu.ad}
                   </Text>
                   {secili && (
-                    <View style={[stiller.siraRozeti, { backgroundColor: r.altin }]}>
+                    <Animated.View
+                      entering={animasyonlar ? FadeInDown.springify().damping(12) : undefined}
+                      style={[stiller.siraRozeti, { backgroundColor: r.altin }]}
+                    >
                       <Text style={stiller.siraRozetMetni}>{siraNo + 1}</Text>
-                    </View>
+                    </Animated.View>
                   )}
                 </Pressable>
+                </Animated.View>
               );
             })}
 
-            <Pressable
-              accessibilityLabel="Havuza yeni oyuncu ekle"
-              onPress={() => formuAc()}
-              style={[stiller.oyuncuKarti, stiller.yeniKarti, { borderColor: r.altin }]}
+            <Animated.View
+              entering={
+                animasyonlar
+                  ? FadeInDown.delay(havuz.length * 45).springify().damping(15)
+                  : undefined
+              }
+              style={stiller.kartSarici}
             >
-              <Plus color={r.altin} size={26} strokeWidth={2.5} />
-              <Text style={[stiller.kartAd, { color: r.altin }]}>Yeni oyuncu</Text>
-            </Pressable>
+              <Pressable
+                accessibilityLabel="Havuza yeni oyuncu ekle"
+                onPress={() => formuAc()}
+                style={[stiller.oyuncuKarti, stiller.yeniKarti, { borderColor: r.altin }]}
+              >
+                <Plus color={r.altin} size={26} strokeWidth={2.5} />
+                <Text style={[stiller.kartAd, { color: r.altin }]}>Yeni oyuncu</Text>
+              </Pressable>
+            </Animated.View>
           </View>
         </>
       )}
@@ -386,8 +408,9 @@ const stiller = StyleSheet.create({
   baslik: { fontSize: 15, fontWeight: '900', letterSpacing: 2, marginTop: 4 },
   ipucu: { fontSize: 13, marginTop: -6 },
   havuzAlani: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  kartSarici: { width: '30.5%' },
   oyuncuKarti: {
-    width: '30.5%',
+    width: '100%',
     minHeight: 84,
     borderRadius: 14,
     borderWidth: 1.5,

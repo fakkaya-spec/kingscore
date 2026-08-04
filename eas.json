@@ -15,12 +15,18 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_TEST_PRO": "1"
+      }
     },
     "simulator": {
       "distribution": "internal",
       "ios": {
         "simulator": true
+      },
+      "env": {
+        "EXPO_PUBLIC_TEST_PRO": "1"
       }
     },
     "production": {

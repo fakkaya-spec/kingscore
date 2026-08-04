@@ -5,6 +5,7 @@ import { useKeepAwake } from 'expo-keep-awake';
 import { Undo2 } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Buton } from '@/bilesenler/Buton';
 import { SkorTablosu } from '@/bilesenler/SkorTablosu';
@@ -20,6 +21,7 @@ import { useRenkler } from '@/tema/renkler';
 /** Masanın karşısından okunacak sade görünüm: ad + toplam, dev puntolarla. */
 function GenelGorunum({ masa }: { masa: Masa }) {
   const r = useRenkler();
+  const animasyonlar = useAyarStore((d) => d.animasyonlar);
   const toplamlar = toplamSkorlar(masa);
   const sirali = [...masa.oyuncular].sort(
     (a, b) => (toplamlar[b.id] ?? 0) - (toplamlar[a.id] ?? 0),
@@ -31,12 +33,13 @@ function GenelGorunum({ masa }: { masa: Masa }) {
       style={[stiller.genelCerceve, { borderColor: r.altin, backgroundColor: r.zeminKoyu }]}
       contentContainerStyle={stiller.genelIcerik}
     >
-      {sirali.map((oyuncu) => {
+      {sirali.map((oyuncu, i) => {
         const puan = toplamlar[oyuncu.id] ?? 0;
         const liderMi = masa.eller.length > 0 && puan === lider && puan > 0;
         return (
-          <View
+          <Animated.View
             key={oyuncu.id}
+            entering={animasyonlar ? FadeInDown.delay(i * 70).springify().damping(14) : undefined}
             style={[
               stiller.genelSatir,
               { borderColor: liderMi ? r.altin : r.cizgi },
@@ -57,7 +60,7 @@ function GenelGorunum({ masa }: { masa: Masa }) {
             >
               {puan > 0 ? `+${puan}` : puan}
             </Text>
-          </View>
+          </Animated.View>
         );
       })}
     </ScrollView>
@@ -90,6 +93,7 @@ export default function MasaEkrani() {
   const { elSil, sonEliGeriAl } = useMasaStore();
   const gorunum = useAyarStore((d) => d.masaGorunumu);
   const gorunumSec = useAyarStore((d) => d.masaGorunumuSec);
+  const animasyonlar = useAyarStore((d) => d.animasyonlar);
 
   const bitti = masa ? masa.bitis !== undefined || oyunBittiMi(masa) : false;
 
@@ -202,16 +206,20 @@ export default function MasaEkrani() {
 
       <KalanOyunlar masa={masa} />
 
-      {/* Sıra bandı */}
+      {/* Sıra bandı: oyuncu değişince yumuşakça yenilenir */}
       {sirali && (
-        <View style={[stiller.siraBandi, { backgroundColor: r.altin }]}>
+        <Animated.View
+          key={sirali.id}
+          entering={animasyonlar ? FadeInDown.springify().damping(15) : undefined}
+          style={[stiller.siraBandi, { backgroundColor: r.altin }]}
+        >
           <Text style={stiller.siraMetni}>
             SIRA: {sirali.emoji} {sirali.ad.toLocaleUpperCase('tr')}
           </Text>
           <Text style={stiller.siraAlt}>
             {masa.eller.length + 1}. el · {20 - masa.eller.length} el kaldı
           </Text>
-        </View>
+        </Animated.View>
       )}
 
       <Buton

@@ -17,6 +17,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
+  FadeInDown,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -185,11 +186,19 @@ export default function SonucEkrani() {
           style={[stiller.paylasilan, { backgroundColor: r.zemin }]}
         >
           <View style={[stiller.siralamaKutusu, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}>
-            {sonuc.siralama.map((satir) => {
+            {sonuc.siralama.map((satir, i) => {
               const kazanan = satir.sira === 1 && satir.puan > 0;
               const sonuncu = satir.oyuncu.id === sonSira.oyuncu.id && satir.puan < 0;
               return (
-                <View key={satir.oyuncu.id} style={stiller.siralamaSatiri}>
+                <Animated.View
+                  key={satir.oyuncu.id}
+                  entering={
+                    animasyonlarAcik
+                      ? FadeInDown.delay(200 + i * 120).springify().damping(14)
+                      : undefined
+                  }
+                  style={stiller.siralamaSatiri}
+                >
                   <View style={stiller.rozetAlani}>
                     {kazanan &&
                       (animasyonlarAcik ? (
@@ -205,8 +214,8 @@ export default function SonucEkrani() {
                   </Text>
                   {satir.kingSayisi > 0 && (
                     <View style={stiller.kingRozetleri}>
-                      {Array.from({ length: satir.kingSayisi }, (_, i) => (
-                        <Crown key={i} color={r.altin} size={16} strokeWidth={2.25} />
+                      {Array.from({ length: satir.kingSayisi }, (_, k) => (
+                        <Crown key={k} color={r.altin} size={16} strokeWidth={2.25} />
                       ))}
                     </View>
                   )}
@@ -218,7 +227,7 @@ export default function SonucEkrani() {
                   >
                     {satir.puan > 0 ? `+${satir.puan}` : satir.puan}
                   </Text>
-                </View>
+                </Animated.View>
               );
             })}
           </View>

@@ -1,15 +1,18 @@
 // El kaydedilince oynayan kısa (≤1.5 sn) kutlama/uyarı animasyonları.
 // Dokununca atlanabilir; ayarlardan animasyonlar kapatılabilir.
 
+import { Crown, Sparkles } from 'lucide-react-native';
 import React, { useEffect } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   FadeIn,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withSequence,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { Konfeti } from './Konfeti';
@@ -23,22 +26,47 @@ interface Props {
   onBitti: () => void;
 }
 
+/** Rıfkı sahnesi için stilize kupa papazı kartı. */
+function KupaPapazi() {
+  return (
+    <View style={stiller.oyunKarti}>
+      <Text style={[stiller.kartKose, stiller.kartKoseUst]}>K{'\n'}♥</Text>
+      <Text style={stiller.kartOrta}>♥</Text>
+      <Text style={[stiller.kartKose, stiller.kartKoseAlt]}>K{'\n'}♥</Text>
+    </View>
+  );
+}
+
 export function MikroAnimasyon({ tur, oyuncuAdi, puanMetni, onBitti }: Props) {
-  const dusme = useSharedValue(-150);
+  const dusme = useSharedValue(-220);
   const buyume = useSharedValue(0.3);
   const flash = useSharedValue(tur === 'rifki' ? 0.55 : 0);
   const sallanma = useSharedValue(0);
+  const parlama = useSharedValue(1);
 
   useEffect(() => {
-    dusme.value = withTiming(0, { duration: 500, easing: Easing.bounce });
-    buyume.value = withTiming(1.15, { duration: 700, easing: Easing.out(Easing.back(2)) });
-    flash.value = withTiming(0, { duration: 700 });
+    // Yay fiziğiyle düşüş: sert iniş yerine hafif sekmeli, doğal duruş
+    dusme.value = withSpring(0, { damping: 12, stiffness: 140, mass: 0.9 });
+    buyume.value = withDelay(
+      120,
+      withSpring(1, { damping: 9, stiffness: 180, overshootClamping: false }),
+    );
+    flash.value = withTiming(0, { duration: 700, easing: Easing.out(Easing.quad) });
     sallanma.value = withRepeat(
       withSequence(
-        withTiming(-8, { duration: 150 }),
-        withTiming(8, { duration: 150 }),
+        withTiming(-7, { duration: 160, easing: Easing.inOut(Easing.sin) }),
+        withTiming(7, { duration: 160, easing: Easing.inOut(Easing.sin) }),
       ),
       4,
+      true,
+    );
+    // Taç/ikon nefes alır gibi hafifçe parlar
+    parlama.value = withRepeat(
+      withSequence(
+        withTiming(1.08, { duration: 320, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: 320, easing: Easing.inOut(Easing.quad) }),
+      ),
+      2,
       true,
     );
     const zamanlayici = setTimeout(onBitti, 1500); // 1.5 saniyeyi geçmez
@@ -47,7 +75,11 @@ export function MikroAnimasyon({ tur, oyuncuAdi, puanMetni, onBitti }: Props) {
   }, []);
 
   const kartStili = useAnimatedStyle(() => ({
-    transform: [{ translateY: dusme.value }, { rotate: `${sallanma.value}deg` }],
+    transform: [
+      { translateY: dusme.value },
+      { rotate: `${sallanma.value}deg` },
+      { scale: parlama.value },
+    ],
   }));
   const puanStili = useAnimatedStyle(() => ({
     transform: [{ scale: buyume.value }],
@@ -57,19 +89,26 @@ export function MikroAnimasyon({ tur, oyuncuAdi, puanMetni, onBitti }: Props) {
   return (
     <Pressable style={stiller.katman} onPress={onBitti} accessibilityLabel="Animasyonu atla">
       {tur === 'rifki' && (
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, stiller.kirmiziFlash, flashStili]} />
+        <Animated.View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, stiller.kirmiziFlash, flashStili]}
+        />
       )}
       {tur === 'king' && <Konfeti />}
       {tur === 'rifki' && (
-        <Animated.Text style={[stiller.kart, kartStili]}>🂾</Animated.Text>
+        <Animated.View style={kartStili}>
+          <KupaPapazi />
+        </Animated.View>
       )}
       {tur === 'king' && (
-        <Animated.Text style={[stiller.kart, kartStili]}>👑</Animated.Text>
+        <Animated.View style={kartStili}>
+          <Crown color="#D4AF37" size={104} strokeWidth={1.75} />
+        </Animated.View>
       )}
       {tur === 'temiz' && (
-        <Animated.Text entering={FadeIn} style={stiller.kart}>
-          👏
-        </Animated.Text>
+        <Animated.View entering={FadeIn}>
+          <Sparkles color="#6FCF97" size={96} strokeWidth={1.75} />
+        </Animated.View>
       )}
       <Animated.Text entering={FadeIn.delay(150)} style={stiller.ad}>
         {oyuncuAdi}
@@ -96,8 +135,28 @@ const stiller = StyleSheet.create({
     zIndex: 50,
   },
   kirmiziFlash: { backgroundColor: '#C1272D' },
-  kart: { fontSize: 96 },
-  ad: { fontSize: 24, fontWeight: '800', color: '#F5EFE0', marginTop: 8 },
-  puan: { fontSize: 56, fontWeight: '900', color: '#E4574F', marginTop: 4 },
+  oyunKarti: {
+    width: 96,
+    height: 134,
+    borderRadius: 12,
+    backgroundColor: '#F5EFE0',
+    borderWidth: 1,
+    borderColor: '#D4AF37',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  kartKose: {
+    position: 'absolute',
+    fontSize: 16,
+    lineHeight: 17,
+    fontWeight: '900',
+    color: '#C1272D',
+    textAlign: 'center',
+  },
+  kartKoseUst: { top: 6, left: 8 },
+  kartKoseAlt: { bottom: 6, right: 8, transform: [{ rotate: '180deg' }] },
+  kartOrta: { fontSize: 44, color: '#C1272D' },
+  ad: { fontSize: 24, fontWeight: '800', color: '#F5EFE0', marginTop: 12 },
+  puan: { fontSize: 56, fontWeight: '900', color: '#C1272D', marginTop: 4 },
   temizPuan: { color: '#6FCF97' },
 });
