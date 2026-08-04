@@ -35,7 +35,7 @@ npm install --legacy-peer-deps
 npm start            # Expo dev server
 
 # Kontroller
-npm test             # 39 jest testi (skor motoru)
+npm test             # 58 jest testi (skor motoru)
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
 ```
@@ -56,7 +56,7 @@ npm run lint         # eslint
 app/                     # expo-router ekranları
   _layout.tsx            # kök stack + tema + RevenueCat başlatma
   index.tsx              # ana ekran
-  oyuncular.tsx          # 4 isim + emoji, "aynı ekiple başla"
+  oyuncular.tsx          # kayıtlı oyuncu havuzundan 1-2-3-4 seçim + hızlı giriş
   masa.tsx               # skor tablosu, sıra bandı, EL GİR, geri al
   oyun-sec.tsx           # modal: haklara göre filtrelenmiş oyun kartları
   el-giris.tsx           # stepper / dokunmatik seçim + canlı doğrulama
@@ -75,11 +75,13 @@ src/
     skor.ts              # puanHesapla, elDogrula, kalanHaklar, toplamSkorlar,
                          # sonucBelirle, secilebilirOyunlar, genelIstatistikler
     gunlukSinir.ts       # günde 1 masa sınırı + saat istismarı koruması
-    __tests__/           # skor.test.ts + gunlukSinir.test.ts (50 test)
+    kalanOyun.ts         # masada her oyunun kaç kez daha oynanabileceği
+    __tests__/           # skor + gunlukSinir + kalanOyun testleri (58 test)
   store/                 # zustand + MMKV persist
     depo.ts              # MMKV örneği + StateStorage adaptörü
     masaStore.ts         # aktif masa, geçmiş, el CRUD, rövanş, günlük hak
-    ayarStore.ts         # sesler/animasyonlar/King kuralı/puan taslağı/tema
+    ayarStore.ts         # sesler/animasyonlar/King kuralı/puan taslağı/tema/görünüm
+    oyuncuHavuzuStore.ts # kayıtlı oyuncu havuzu (ad + emoji), masalardan bağımsız
     proStore.ts          # usePro() — offline cache'li `pro` entitlement
   servisler/
     satinalma.ts         # RevenueCat sarmalayıcısı
@@ -146,7 +148,7 @@ Kod tarafında yapılacak tek şey: `src/servisler/satinalma.ts` içindeki
 ### 3. RevenueCat panosu
 
 1. Proje oluşturun, iOS ve Android uygulamalarını bağlayın
-   (bundle id: `com.kingskor.app`).
+   (bundle id: `com.kosko.kingskor`).
 2. **Entitlements**: `pro` adında entitlement oluşturun.
 3. **Products**: mağazalardan `king_pro_lifetime` ürününü içe aktarın ve
    `pro` entitlement'ına bağlayın.
@@ -178,6 +180,32 @@ Apple incelemesi için: paywall'da "Satın Alımları Geri Yükle" butonu, "abon
 yenileme yok" ifadesi, Gizlilik Politikası ve EULA bağlantıları ile kolay kapatılan X
 hazırdır. Gizlilik beyanında "veri toplanmıyor" işaretleyebilirsiniz
 (tek istisna: mağaza satın alma doğrulaması).
+
+## Tarayıcıdan EAS build alma
+
+Yerel kurulum gerektirmeden, build'leri tamamen tarayıcı üzerinden tetikleyebilirsiniz:
+
+1. **Expo hesabı açın:** [expo.dev](https://expo.dev) → Sign Up. Ücretsiz plan
+   aylık sınırlı build hakkı verir; başlamak için yeterlidir.
+2. **Projeyi oluşturun:** expo.dev panosunda **Create a project** deyin, ad olarak
+   `king-skor` girin (app.json'daki `slug` ile aynı olmalı).
+3. **GitHub'ı bağlayın:** Proje sayfasında **Settings → GitHub** bölümünden
+   **Connect GitHub** deyip Expo GitHub App'e bu depoya erişim izni verin ve
+   depoyu projeyle eşleştirin.
+4. **Build trigger oluşturun:** Proje sayfasında **Builds → Build from GitHub**
+   (veya Settings → GitHub → **Build triggers**) altından yeni kural ekleyin:
+   - Dal: `main` (veya build almak istediğiniz dal)
+   - Platform: Android, iOS veya ikisi
+   - Profil: `development` / `preview` / `production` (bu depodaki `eas.json`
+     profilleri otomatik okunur)
+5. **Build'i başlatın:** Dala push yaptığınızda trigger otomatik çalışır; ayrıca
+   proje sayfasındaki **Build from GitHub** butonuyla istediğiniz commit'ten elle
+   başlatabilirsiniz. Build bitince APK/IPA dosyasını panodan indirirsiniz.
+
+Not: `development` profili `developmentClient: true` + `distribution: internal`
+ayarlıdır — cihazınıza kurup `npx expo start` ile bağlanabileceğiniz geliştirme
+istemcisi üretir. iOS build'leri için Apple Developer hesabı kimlik bilgilerini
+ilk build sırasında Expo'ya tanıtmanız istenir.
 
 ## Yedekleme
 

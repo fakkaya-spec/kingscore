@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- King Skor uygulama ikonu kaynağı: taçlı horoz silüeti.
+       Zemin koyu sıcak yeşil, silüet krem, taç altın. -->
+  <rect width="1024" height="1024" fill="#0A2E1F"/>
+  <g id="horoz">
+    <!-- Orak biçimli kuyruk telekleri: yükselip geriye kıvrılır -->
+    <path fill="#F5EFE0" d="M480 545
+      C 350 500, 260 410, 245 285
+      C 240 210, 285 150, 365 135
+      C 320 165, 295 210, 300 265
+      C 315 380, 390 470, 505 515 Z"/>
+    <path fill="#F5EFE0" d="M485 585
+      C 330 560, 205 480, 155 355
+      C 130 290, 155 220, 225 190
+      C 185 235, 175 290, 200 345
+      C 245 445, 360 520, 505 550 Z"/>
+    <path fill="#F5EFE0" d="M480 630
+      C 320 650, 180 620, 95 530
+      C 65 495, 55 450, 70 410
+      C 160 520, 320 580, 500 585 Z"/>
+    <!-- Gövde -->
+    <ellipse fill="#F5EFE0" cx="530" cy="655" rx="195" ry="150"/>
+    <!-- Boyun ve baş: S kıvrımlı -->
+    <path fill="#F5EFE0" d="M610 770
+      C 705 705, 700 540, 690 430
+      C 685 365, 705 315, 750 298
+      C 805 282, 845 322, 840 368
+      C 837 425, 815 480, 795 545
+      C 778 620, 765 700, 700 770 Z"/>
+    <circle fill="#F5EFE0" cx="770" cy="350" r="60"/>
+    <!-- Gaga -->
+    <path fill="#F5EFE0" d="M824 330 L 892 352 L 824 374 Z"/>
+    <!-- Sakal: gaganın altında sarkar -->
+    <path fill="#F5EFE0" d="M812 385
+      C 838 395, 848 432, 830 458
+      C 812 482, 778 476, 772 450
+      C 767 425, 785 392, 812 385 Z"/>
+    <!-- Göz -->
+    <circle fill="#0A2E1F" cx="782" cy="336" r="11"/>
+    <!-- Bacaklar -->
+    <path stroke="#F5EFE0" stroke-width="20" stroke-linecap="round" fill="none" d="M485 795 L 473 900 M473 900 L 438 925 M473 900 L 503 928 M473 900 L 473 932"/>
+    <path stroke="#F5EFE0" stroke-width="20" stroke-linecap="round" fill="none" d="M580 800 L 590 900 M590 900 L 555 925 M590 900 L 620 928 M590 900 L 590 932"/>
+  </g>
+  <!-- Altın taç -->
+  <g id="tac">
+    <path fill="#D4AF37" d="M706 268 L 694 180 L 739 233 L 768 165 L 797 233 L 842 180 L 830 268 C 791 288, 745 288, 706 268 Z"/>
+    <circle fill="#D4AF37" cx="694" cy="170" r="12"/>
+    <circle fill="#D4AF37" cx="768" cy="153" r="12"/>
+    <circle fill="#D4AF37" cx="842" cy="170" r="12"/>
+  </g>
+</svg>

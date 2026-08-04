@@ -2,6 +2,17 @@
 // rövanş ve skor paylaşma.
 
 import { useRouter } from 'expo-router';
+import {
+  Bird,
+  CloudRain,
+  Crown,
+  Layers,
+  PartyPopper,
+  Scale,
+  Sparkles,
+  TriangleAlert,
+  type LucideIcon,
+} from 'lucide-react-native';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -26,15 +37,23 @@ import { usePro } from '@/store/proStore';
 import { useAyarStore } from '@/store/ayarStore';
 import { useRenkler } from '@/tema/renkler';
 
-const DURUM_SAHNELERI: Record<SonucDurumu, { emoji: string; baslik: string }> = {
-  TEK_KRAL: { emoji: '🐓', baslik: 'TEK BAŞINA ÇIKTI! KRAL!' },
-  IKILI_CIKIS: { emoji: '🥂', baslik: 'İKİLİ ÇIKIŞ!' },
-  TEK_TAVUK: { emoji: '🐔', baslik: 'TEK BAŞINA BATTI! Gıt gıt gıdak...' },
-  UC_BATTI: { emoji: '🌧️', baslik: 'ÜÇÜ BİRDEN BATTI!' },
-  BERABERE: { emoji: '⚖️', baslik: 'BERABERE!' },
+const DURUM_SAHNELERI: Record<SonucDurumu, { Ikon: LucideIcon; baslik: string }> = {
+  TEK_KRAL: { Ikon: Crown, baslik: 'TEK BAŞINA ÇIKTI! KRAL!' },
+  IKILI_CIKIS: { Ikon: PartyPopper, baslik: 'İKİLİ ÇIKIŞ!' },
+  TEK_TAVUK: { Ikon: Bird, baslik: 'TEK BAŞINA BATTI! Gıt gıt gıdak...' },
+  UC_BATTI: { Ikon: CloudRain, baslik: 'ÜÇÜ BİRDEN BATTI!' },
+  BERABERE: { Ikon: Scale, baslik: 'BERABERE!' },
 };
 
-function SahneEmojisi({ emoji, durum }: { emoji: string; durum: SonucDurumu }) {
+function SahneIkonu({
+  Ikon,
+  durum,
+  renk,
+}: {
+  Ikon: LucideIcon;
+  durum: SonucDurumu;
+  renk: string;
+}) {
   const olcek = useSharedValue(0.2);
   const donus = useSharedValue(0);
 
@@ -53,16 +72,24 @@ function SahneEmojisi({ emoji, durum }: { emoji: string; durum: SonucDurumu }) {
     transform: [{ scale: olcek.value }, { rotate: `${donus.value}deg` }],
   }));
 
-  return <Animated.Text style={[stiller.sahneEmoji, stil]}>{emoji}</Animated.Text>;
+  return (
+    <Animated.View style={stil}>
+      <Ikon color={renk} size={96} strokeWidth={1.75} />
+    </Animated.View>
+  );
 }
 
-function DonenTac() {
+function DonenTac({ renk }: { renk: string }) {
   const donus = useSharedValue(0);
   useEffect(() => {
     donus.value = withRepeat(withTiming(360, { duration: 2400, easing: Easing.linear }), -1);
   }, [donus]);
   const stil = useAnimatedStyle(() => ({ transform: [{ rotateY: `${donus.value}deg` }] }));
-  return <Animated.Text style={[stiller.rozet, stil]}>👑</Animated.Text>;
+  return (
+    <Animated.View style={stil}>
+      <Crown color={renk} size={24} strokeWidth={2.25} />
+    </Animated.View>
+  );
 }
 
 export default function SonucEkrani() {
@@ -130,22 +157,23 @@ export default function SonucEkrani() {
         {/* Sahne */}
         <View style={stiller.sahne}>
           {animasyonlarAcik ? (
-            <SahneEmojisi emoji={sahne.emoji} durum={sonuc.durum} />
+            <SahneIkonu Ikon={sahne.Ikon} durum={sonuc.durum} renk={r.altin} />
           ) : (
-            <Text style={stiller.sahneEmoji}>{sahne.emoji}</Text>
+            <sahne.Ikon color={r.altin} size={96} strokeWidth={1.75} />
           )}
           <Text style={[stiller.sahneBaslik, { color: r.altin }]}>{sahne.baslik}</Text>
           {sonuc.durum === 'UC_BATTI' && (
             <Text style={[stiller.sahneAlt, { color: r.soluk }]}>
-              {kaybedenler.map((s) => `🌧️ ${s.oyuncu.ad}`).join('   ')}
+              {kaybedenler.map((s) => s.oyuncu.ad).join(' · ')}
             </Text>
           )}
         </View>
 
         {!sonuc.toplamSifir && (
           <View style={[stiller.uyari, { backgroundColor: r.kirmizi }]}>
+            <TriangleAlert color="#fff" size={18} strokeWidth={2.25} />
             <Text style={stiller.uyariMetni}>
-              ⚠ Puan toplamı 0 değil! Girilen ellerde hata olabilir, tabloyu kontrol edin.
+              Puan toplamı 0 değil! Girilen ellerde hata olabilir, tabloyu kontrol edin.
             </Text>
           </View>
         )}
@@ -163,14 +191,25 @@ export default function SonucEkrani() {
               return (
                 <View key={satir.oyuncu.id} style={stiller.siralamaSatiri}>
                   <View style={stiller.rozetAlani}>
-                    {kazanan && (animasyonlarAcik ? <DonenTac /> : <Text style={stiller.rozet}>👑</Text>)}
-                    {sonuncu && <Text style={stiller.rozet}>🐔</Text>}
+                    {kazanan &&
+                      (animasyonlarAcik ? (
+                        <DonenTac renk={r.altin} />
+                      ) : (
+                        <Crown color={r.altin} size={24} strokeWidth={2.25} />
+                      ))}
+                    {sonuncu && <Bird color={r.kirmizi} size={24} strokeWidth={2.25} />}
                   </View>
                   <Text style={[stiller.siraNo, { color: r.soluk }]}>{satir.sira}.</Text>
                   <Text style={[stiller.siraAd, { color: r.metin }]} numberOfLines={1}>
                     {satir.oyuncu.emoji} {satir.oyuncu.ad}
-                    {satir.kingSayisi > 0 ? ` ${'👑'.repeat(satir.kingSayisi)}` : ''}
                   </Text>
+                  {satir.kingSayisi > 0 && (
+                    <View style={stiller.kingRozetleri}>
+                      {Array.from({ length: satir.kingSayisi }, (_, i) => (
+                        <Crown key={i} color={r.altin} size={16} strokeWidth={2.25} />
+                      ))}
+                    </View>
+                  )}
                   <Text
                     style={[
                       stiller.siraPuan,
@@ -187,27 +226,39 @@ export default function SonucEkrani() {
           {/* Eğlenceli istatistikler */}
           <View style={[stiller.istKutusu, { borderColor: r.cizgi }]}>
             {sonuc.istatistikler.kingSayisi > 0 && (
-              <Text style={[stiller.ist, { color: r.soluk }]}>
-                👑 Bu masada {sonuc.istatistikler.kingSayisi} kez King yapıldı
-              </Text>
+              <View style={stiller.istSatiri}>
+                <Crown color={r.altin} size={16} strokeWidth={2.25} />
+                <Text style={[stiller.ist, { color: r.soluk }]}>
+                  Bu masada {sonuc.istatistikler.kingSayisi} kez King yapıldı
+                </Text>
+              </View>
             )}
             {sonuc.istatistikler.enCokRifkiYiyen && (
-              <Text style={[stiller.ist, { color: r.soluk }]}>
-                ♥K En çok rıfkı yiyen: {sonuc.istatistikler.enCokRifkiYiyen.oyuncu.ad} (
-                {sonuc.istatistikler.enCokRifkiYiyen.adet} kez)
-              </Text>
+              <View style={stiller.istSatiri}>
+                <Text style={[stiller.istGlif, { color: r.kirmizi }]}>♥K</Text>
+                <Text style={[stiller.ist, { color: r.soluk }]}>
+                  En çok rıfkı yiyen: {sonuc.istatistikler.enCokRifkiYiyen.oyuncu.ad} (
+                  {sonuc.istatistikler.enCokRifkiYiyen.adet} kez)
+                </Text>
+              </View>
             )}
             {sonuc.istatistikler.enTemizOyuncu && (
-              <Text style={[stiller.ist, { color: r.soluk }]}>
-                👏 En temiz el: {sonuc.istatistikler.enTemizOyuncu.oyuncu.ad} (
-                {sonuc.istatistikler.enTemizOyuncu.temizElSayisi} ceza elini sıfırla atlattı)
-              </Text>
+              <View style={stiller.istSatiri}>
+                <Sparkles color={r.altin} size={16} strokeWidth={2.25} />
+                <Text style={[stiller.ist, { color: r.soluk }]}>
+                  En temiz el: {sonuc.istatistikler.enTemizOyuncu.oyuncu.ad} (
+                  {sonuc.istatistikler.enTemizOyuncu.temizElSayisi} ceza elini sıfırla atlattı)
+                </Text>
+              </View>
             )}
             {sonuc.istatistikler.enCokElAlan && (
-              <Text style={[stiller.ist, { color: r.soluk }]}>
-                🃏 En çok el toplayan: {sonuc.istatistikler.enCokElAlan.oyuncu.ad} (
-                {sonuc.istatistikler.enCokElAlan.elSayisi} el)
-              </Text>
+              <View style={stiller.istSatiri}>
+                <Layers color={r.soluk} size={16} strokeWidth={2.25} />
+                <Text style={[stiller.ist, { color: r.soluk }]}>
+                  En çok el toplayan: {sonuc.istatistikler.enCokElAlan.oyuncu.ad} (
+                  {sonuc.istatistikler.enCokElAlan.elSayisi} el)
+                </Text>
+              </View>
             )}
           </View>
 
@@ -221,9 +272,9 @@ export default function SonucEkrani() {
           )}
         </View>
 
-        <Buton baslik="Rövanş 🔄" buyuk onPress={() => kapatVeGit('rovans')} stil={stiller.aralik} />
+        <Buton baslik="Rövanş" buyuk onPress={() => kapatVeGit('rovans')} stil={stiller.aralik} />
         <Buton
-          baslik="Skoru Paylaş 📤"
+          baslik="Skoru Paylaş"
           tur="ikincil"
           onPress={() => goruntuyuPaylas(paylasilanRef)}
           stil={stiller.aralik}
@@ -240,11 +291,17 @@ const stiller = StyleSheet.create({
   govde: { flex: 1 },
   icerik: { padding: 16, paddingBottom: 32 },
   sahne: { alignItems: 'center', paddingVertical: 16 },
-  sahneEmoji: { fontSize: 96 },
   sahneBaslik: { fontSize: 24, fontWeight: '900', textAlign: 'center', marginTop: 8 },
   sahneAlt: { fontSize: 16, marginTop: 8 },
-  uyari: { borderRadius: 12, padding: 12, marginBottom: 12 },
-  uyariMetni: { color: '#fff', fontWeight: '700', textAlign: 'center' },
+  uyari: {
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  uyariMetni: { color: '#fff', fontWeight: '700', flex: 1 },
   paylasilan: { borderRadius: 16, paddingBottom: 8 },
   siralamaKutusu: {
     borderWidth: 2,
@@ -254,7 +311,7 @@ const stiller = StyleSheet.create({
   },
   siralamaSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rozetAlani: { width: 34, alignItems: 'center' },
-  rozet: { fontSize: 24 },
+  kingRozetleri: { flexDirection: 'row', gap: 2 },
   siraNo: { fontSize: 18, fontWeight: '800', width: 26, fontVariant: ['tabular-nums'] },
   siraAd: { flex: 1, fontSize: 19, fontWeight: '800' },
   siraPuan: { fontSize: 24, fontWeight: '900', fontVariant: ['tabular-nums'] },
@@ -265,7 +322,9 @@ const stiller = StyleSheet.create({
     marginTop: 12,
     gap: 6,
   },
-  ist: { fontSize: 14, fontWeight: '600' },
+  istSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  istGlif: { fontSize: 14, fontWeight: '900', width: 16, textAlign: 'center' },
+  ist: { fontSize: 14, fontWeight: '600', flex: 1 },
   tabloAlani: { height: 320, marginTop: 12 },
   filigran: { textAlign: 'center', marginTop: 8, fontSize: 12, fontStyle: 'italic' },
   aralik: { marginTop: 10 },

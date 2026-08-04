@@ -29,7 +29,7 @@ export default function KurallarEkrani() {
         Her oyuncunun 2 koz + 3 ceza söyleme hakkı vardır (4 × 5 = 20 el).{'\n'}
         Her ceza türü masada en fazla 2 kez oynanabilir (6 × 2 = 12 ceza eli).{'\n'}
         Koz elleri: 4 × 2 = 8. Toplam 12 + 8 = 20 el.{'\n\n'}
-        Bir koz elinde 11 veya daha fazla el alan oyuncu King yapmış sayılır. 👑
+        Bir koz elinde 11 veya daha fazla el alan oyuncu King yapmış sayılır.
       </Text>
 
       <Text style={[stiller.baslik, { color: r.altin }]}>Puan Tablosu</Text>

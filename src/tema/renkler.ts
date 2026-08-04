@@ -17,19 +17,23 @@ export interface Renkler {
   pasif: string;
 }
 
-/** Yeşil çuha (varsayılan, ücretsiz). */
+/**
+ * Yeşil çuha (varsayılan, ücretsiz).
+ * Zemin bilinçli olarak teal'den uzak, derin ve sıcak bir yeşildir;
+ * altın baskın vurgu, kırmızı yalnızca rıfkı ve negatif puanlarda kullanılır.
+ */
 export const CUHA: Renkler = {
-  zemin: '#0B3D2E',
-  zeminKoyu: '#072A20',
+  zemin: '#0A2E1F',
+  zeminKoyu: '#051D12',
   kart: '#F5EFE0',
   kartUstu: '#1A1A1A',
   metin: '#F5EFE0',
-  soluk: '#9DBFB2',
+  soluk: '#93B5A5',
   altin: '#D4AF37',
-  kirmizi: '#E4574F',
+  kirmizi: '#C1272D',
   yesil: '#6FCF97',
-  cizgi: '#1C5A46',
-  pasif: '#3A6B5B',
+  cizgi: '#164632',
+  pasif: '#2F5A45',
 };
 
 /** Ahşap masa (Pro). */
@@ -41,7 +45,7 @@ export const AHSAP: Renkler = {
   metin: '#F2E7D5',
   soluk: '#BCA588',
   altin: '#D4AF37',
-  kirmizi: '#E4574F',
+  kirmizi: '#C1272D',
   yesil: '#8FCF97',
   cizgi: '#5A4330',
   pasif: '#6B5641',
@@ -56,7 +60,7 @@ export const GECE: Renkler = {
   metin: '#EDF1F7',
   soluk: '#8FA3C4',
   altin: '#D4AF37',
-  kirmizi: '#E4574F',
+  kirmizi: '#C1272D',
   yesil: '#6FCF97',
   cizgi: '#1E3560',
   pasif: '#3C5480',

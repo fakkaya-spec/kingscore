@@ -2,6 +2,7 @@
 // ama içerik kilit rozetiyle kapalıdır — ne alacağını bilsin.
 
 import { useRouter } from 'expo-router';
+import { Crown, Lock } from 'lucide-react-native';
 import React, { useMemo } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
@@ -42,9 +43,12 @@ export default function GecmisEkrani() {
                 onPress={() => router.push('/paywall')}
                 style={[stiller.kilitBandi, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}
               >
-                <Text style={[stiller.kilitBaslik, { color: r.altin }]}>
-                  🔒 Geçmiş masalar ve istatistikler Pro ile açılır
-                </Text>
+                <View style={stiller.kilitSatiri}>
+                  <Lock color={r.altin} size={16} strokeWidth={2.25} />
+                  <Text style={[stiller.kilitBaslik, { color: r.altin }]}>
+                    Geçmiş masalar ve istatistikler Pro ile açılır
+                  </Text>
+                </View>
                 <Text style={[stiller.kilitAlt, { color: r.soluk }]}>
                   En çok rıfkı yiyen · en çok King yapan · oyuncu ortalamaları
                 </Text>
@@ -62,10 +66,13 @@ export default function GecmisEkrani() {
                   </Text>
                 )}
                 {istatistik.enCokKingYapan && (
-                  <Text style={[stiller.ist, { color: r.metin }]}>
-                    👑 En çok King yapan: {istatistik.enCokKingYapan.ad} (
-                    {istatistik.enCokKingYapan.adet} kez)
-                  </Text>
+                  <View style={stiller.kilitSatiri}>
+                    <Crown color={r.altin} size={15} strokeWidth={2.25} />
+                    <Text style={[stiller.ist, { color: r.metin }]}>
+                      En çok King yapan: {istatistik.enCokKingYapan.ad} (
+                      {istatistik.enCokKingYapan.adet} kez)
+                    </Text>
+                  </View>
                 )}
                 {istatistik.oyuncuOrtalamalari.slice(0, 6).map((o) => (
                   <Text key={o.ad} style={[stiller.ist, { color: r.soluk }]}>
@@ -110,14 +117,22 @@ export default function GecmisEkrani() {
                 { backgroundColor: r.zeminKoyu, borderColor: r.cizgi, opacity: proMu ? 1 : 0.6 },
               ]}
             >
-              <Text style={[stiller.kartBaslik, { color: r.metin }]}>
-                {proMu ? item.ad || tarih : `🔒 ${item.ad || tarih}`}
-              </Text>
-              <Text style={[stiller.kartAlt, { color: r.soluk }]} numberOfLines={1}>
-                {proMu
-                  ? `👑 ${kazanan.ad} (${(toplamlar[kazanan.id] ?? 0) > 0 ? '+' : ''}${toplamlar[kazanan.id] ?? 0}) · ${item.eller.length} el · ${tarih}`
-                  : 'Detay için Pro gerekli'}
-              </Text>
+              <View style={stiller.kilitSatiri}>
+                {!proMu && <Lock color={r.soluk} size={15} strokeWidth={2.25} />}
+                <Text style={[stiller.kartBaslik, { color: r.metin }]}>{item.ad || tarih}</Text>
+              </View>
+              {proMu ? (
+                <View style={[stiller.kilitSatiri, stiller.kartAltSatiri]}>
+                  <Crown color={r.altin} size={14} strokeWidth={2.25} />
+                  <Text style={[stiller.kartAlt, { color: r.soluk }]} numberOfLines={1}>
+                    {`${kazanan.ad} (${(toplamlar[kazanan.id] ?? 0) > 0 ? '+' : ''}${toplamlar[kazanan.id] ?? 0}) · ${item.eller.length} el · ${tarih}`}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={[stiller.kartAlt, stiller.kartAltSatiri, { color: r.soluk }]}>
+                  Detay için Pro gerekli
+                </Text>
+              )}
             </Pressable>
           );
         }}
@@ -134,15 +149,17 @@ const stiller = StyleSheet.create({
   govde: { flex: 1 },
   liste: { padding: 16 },
   kilitBandi: { borderWidth: 2, borderRadius: 14, padding: 14, marginBottom: 12 },
-  kilitBaslik: { fontSize: 15, fontWeight: '800' },
+  kilitSatiri: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  kilitBaslik: { fontSize: 15, fontWeight: '800', flex: 1 },
   kilitAlt: { fontSize: 13, marginTop: 4 },
   istKutusu: { borderWidth: 2, borderRadius: 14, padding: 14, marginBottom: 12, gap: 4 },
   istBaslik: { fontSize: 15, fontWeight: '900', marginBottom: 4 },
   ist: { fontSize: 14, fontWeight: '600' },
   bos: { textAlign: 'center', marginTop: 48, fontSize: 15 },
   kart: { borderRadius: 14, borderWidth: 1, padding: 14, marginBottom: 10 },
-  kartBaslik: { fontSize: 17, fontWeight: '800' },
-  kartAlt: { fontSize: 13, marginTop: 4 },
+  kartBaslik: { fontSize: 17, fontWeight: '800', flexShrink: 1 },
+  kartAlt: { fontSize: 13, flexShrink: 1 },
+  kartAltSatiri: { marginTop: 4 },
   altAlan: { padding: 16 },
   aralik: { marginTop: 8 },
 });

@@ -1,10 +1,10 @@
-// Ana ekran: Yeni Masa, Devam Et, Geçmiş, Kurallar, Ayarlar.
+// Ana ekran: büyük YENİ MASA kartı + devam eden masa kartı; diğerleri alt ikon satırında.
 
 import { useRouter } from 'expo-router';
+import { BookOpen, History, Lock, Play, Settings, Spade } from 'lucide-react-native';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Buton } from '@/bilesenler/Buton';
 import { TOPLAM_EL_SAYISI } from '@/core/sabitler';
 import { hafifTitret } from '@/servisler/titresim';
 import { usePro } from '@/store/proStore';
@@ -16,6 +16,16 @@ export default function AnaEkran() {
   const r = useRenkler();
   const aktifMasa = useMasaStore((d) => d.aktifMasa);
   const proMu = usePro();
+
+  const altSatir = [
+    {
+      ad: 'Geçmiş',
+      Ikon: proMu ? History : Lock,
+      git: () => router.push('/gecmis'),
+    },
+    { ad: 'Kurallar', Ikon: BookOpen, git: () => router.push('/kurallar') },
+    { ad: 'Ayarlar', Ikon: Settings, git: () => router.push('/ayarlar') },
+  ];
 
   return (
     <SafeAreaView style={[stiller.govde, { backgroundColor: r.zemin }]}>
@@ -33,9 +43,12 @@ export default function AnaEkran() {
             }}
             style={[stiller.devamKarti, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}
           >
-            <Text style={[stiller.devamBaslik, { color: r.altin }]}>
-              Devam Et — {aktifMasa.eller.length}/{TOPLAM_EL_SAYISI} el
-            </Text>
+            <View style={stiller.kartBaslikSatiri}>
+              <Play color={r.altin} size={20} strokeWidth={2.5} />
+              <Text style={[stiller.devamBaslik, { color: r.altin }]}>
+                Devam Et — {aktifMasa.eller.length}/{TOPLAM_EL_SAYISI} el
+              </Text>
+            </View>
             <Text style={[stiller.devamAlt, { color: r.soluk }]} numberOfLines={1}>
               {aktifMasa.ad ? `${aktifMasa.ad} · ` : ''}
               {aktifMasa.oyuncular.map((o) => o.ad).join(', ')}
@@ -43,33 +56,40 @@ export default function AnaEkran() {
           </Pressable>
         )}
 
-        <Buton
-          baslik="YENİ MASA"
-          buyuk
+        <Pressable
+          accessibilityRole="button"
           onPress={() => {
+            hafifTitret();
             // Ücretsizde günde 1 masa; hakkı bitince paywall (masa ortasında asla kilit yok)
             router.push(yeniMasaHakkiVarMi(proMu) ? '/oyuncular' : '/paywall');
           }}
-          stil={stiller.aralik}
-        />
-        <Buton
-          baslik={proMu ? 'Geçmiş Masalar' : 'Geçmiş Masalar 🔒'}
-          tur="ikincil"
-          onPress={() => router.push('/gecmis')}
-          stil={stiller.aralik}
-        />
-        <Buton
-          baslik="Kurallar & Puan Tablosu"
-          tur="ikincil"
-          onPress={() => router.push('/kurallar')}
-          stil={stiller.aralik}
-        />
-        <Buton
-          baslik="Ayarlar"
-          tur="ikincil"
-          onPress={() => router.push('/ayarlar')}
-          stil={stiller.aralik}
-        />
+          style={({ pressed }) => [
+            stiller.yeniMasaKarti,
+            { backgroundColor: r.altin, opacity: pressed ? 0.85 : 1 },
+          ]}
+        >
+          <Spade color="#1A1A1A" size={34} strokeWidth={2.25} fill="#1A1A1A" />
+          <Text style={stiller.yeniMasaMetni}>YENİ MASA</Text>
+          <Text style={stiller.yeniMasaAlt}>4 oyuncu seç, dağıtmaya başla</Text>
+        </Pressable>
+
+        <View style={[stiller.altSatir, { borderColor: r.cizgi }]}>
+          {altSatir.map(({ ad, Ikon, git }) => (
+            <Pressable
+              key={ad}
+              accessibilityRole="button"
+              accessibilityLabel={ad}
+              onPress={() => {
+                hafifTitret();
+                git();
+              }}
+              style={({ pressed }) => [stiller.altTus, { opacity: pressed ? 0.7 : 1 }]}
+            >
+              <Ikon color={r.soluk} size={22} strokeWidth={2} />
+              <Text style={[stiller.altTusMetni, { color: r.soluk }]}>{ad}</Text>
+            </Pressable>
+          ))}
+        </View>
 
         <View style={stiller.altBilgi}>
           <Text style={[stiller.altMetin, { color: r.soluk }]}>
@@ -92,9 +112,26 @@ const stiller = StyleSheet.create({
     padding: 18,
     marginBottom: 16,
   },
+  kartBaslikSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   devamBaslik: { fontSize: 20, fontWeight: '800' },
   devamAlt: { fontSize: 14, marginTop: 4 },
-  aralik: { marginBottom: 12 },
+  yeniMasaKarti: {
+    borderRadius: 22,
+    paddingVertical: 34,
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 20,
+  },
+  yeniMasaMetni: { fontSize: 30, fontWeight: '900', color: '#1A1A1A', letterSpacing: 2 },
+  yeniMasaAlt: { fontSize: 14, fontWeight: '600', color: '#1A1A1A', opacity: 0.7 },
+  altSatir: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderTopWidth: 1,
+    paddingTop: 16,
+  },
+  altTus: { alignItems: 'center', gap: 4, minWidth: 72, paddingVertical: 6 },
+  altTusMetni: { fontSize: 13, fontWeight: '600' },
   altBilgi: { marginTop: 24, alignItems: 'center' },
   altMetin: { fontSize: 12 },
 });

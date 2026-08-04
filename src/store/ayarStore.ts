@@ -7,18 +7,21 @@ import type { PuanTablosu } from '@/core/tipler';
 import { mmkvDepo } from './depo';
 
 export type Tema = 'cuha' | 'ahsap' | 'gece';
+export type MasaGorunumu = 'genel' | 'detayli';
 
 interface AyarDurumu {
   sesler: boolean;
   animasyonlar: boolean;
   kingdeBiter: boolean; // King yapılınca oyun biter (varsayılan kapalı)
   tema: Tema;
+  masaGorunumu: MasaGorunumu; // masa ekranındaki Genel/Detaylı sekmesi
   puanTablosu: PuanTablosu; // yeni masalara kopyalanacak taslak
 
   seslerAc: (acik: boolean) => void;
   animasyonlarAc: (acik: boolean) => void;
   kingdeBiterAc: (acik: boolean) => void;
   temaSec: (tema: Tema) => void;
+  masaGorunumuSec: (gorunum: MasaGorunumu) => void;
   puanGuncelle: (alan: keyof PuanTablosu, deger: number) => void;
   varsayilanaDon: () => void;
 }
@@ -30,12 +33,14 @@ export const useAyarStore = create<AyarDurumu>()(
       animasyonlar: true,
       kingdeBiter: false,
       tema: 'cuha',
+      masaGorunumu: 'detayli',
       puanTablosu: { ...VARSAYILAN_PUAN_TABLOSU },
 
       seslerAc: (acik) => set({ sesler: acik }),
       animasyonlarAc: (acik) => set({ animasyonlar: acik }),
       kingdeBiterAc: (acik) => set({ kingdeBiter: acik }),
       temaSec: (tema) => set({ tema }),
+      masaGorunumuSec: (gorunum) => set({ masaGorunumu: gorunum }),
       puanGuncelle: (alan, deger) =>
         set((d) => ({ puanTablosu: { ...d.puanTablosu, [alan]: deger } })),
       varsayilanaDon: () => set({ puanTablosu: { ...VARSAYILAN_PUAN_TABLOSU } }),

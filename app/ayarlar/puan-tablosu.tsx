@@ -2,6 +2,7 @@
 // Değişiklik yalnız yeni kurulacak masalara uygulanır (masadaki snapshot kilitlidir).
 
 import { useRouter } from 'expo-router';
+import { Lock } from 'lucide-react-native';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
@@ -36,9 +37,12 @@ export default function PuanTablosuEkrani() {
     >
       {!proMu && (
         <View style={[stiller.kilitBandi, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}>
-          <Text style={[stiller.kilitMetin, { color: r.altin }]}>
-            🔒 Puan tablosunu özelleştirme Pro ile açılır
-          </Text>
+          <View style={stiller.kilitSatiri}>
+            <Lock color={r.altin} size={16} strokeWidth={2.25} />
+            <Text style={[stiller.kilitMetin, { color: r.altin }]}>
+              Puan tablosunu özelleştirme Pro ile açılır
+            </Text>
+          </View>
           <Buton baslik="Pro'yu İncele" onPress={() => router.push('/paywall')} />
         </View>
       )}
@@ -120,5 +124,6 @@ const stiller = StyleSheet.create({
   },
   aralik: { marginTop: 20 },
   kilitBandi: { borderWidth: 2, borderRadius: 14, padding: 14, marginBottom: 12, gap: 10 },
+  kilitSatiri: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   kilitMetin: { fontSize: 15, fontWeight: '800', textAlign: 'center' },
 });

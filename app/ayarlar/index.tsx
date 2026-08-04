@@ -1,6 +1,7 @@
 // Ayarlar: sesler, animasyonlar, King kuralı, masa teması, puan tablosu, yedekleme.
 
 import { useRouter } from 'expo-router';
+import { Check, Lock } from 'lucide-react-native';
 import React from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
@@ -75,17 +76,22 @@ export default function AyarlarEkrani() {
                 },
               ]}
             >
-              <Text style={[stiller.temaAdi, { color: onizleme.metin }]}>
-                {kilitli ? '🔒 ' : secili ? '✓ ' : ''}
-                {TEMA_ADLARI[tema]}
-              </Text>
+              <View style={stiller.temaAdiSatiri}>
+                {kilitli && <Lock color={onizleme.metin} size={14} strokeWidth={2.25} />}
+                {!kilitli && secili && (
+                  <Check color={onizleme.metin} size={14} strokeWidth={3} />
+                )}
+                <Text style={[stiller.temaAdi, { color: onizleme.metin }]}>
+                  {TEMA_ADLARI[tema]}
+                </Text>
+              </View>
             </Pressable>
           );
         })}
       </View>
 
       <Buton
-        baslik={proMu ? 'Puan Tablosunu Özelleştir' : 'Puan Tablosunu Özelleştir 🔒'}
+        baslik={proMu ? 'Puan Tablosunu Özelleştir' : 'Puan Tablosunu Özelleştir (Pro)'}
         tur="ikincil"
         onPress={() => router.push('/ayarlar/puan-tablosu')}
         stil={stiller.aralik}
@@ -128,6 +134,7 @@ const stiller = StyleSheet.create({
     justifyContent: 'center',
     padding: 8,
   },
+  temaAdiSatiri: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 },
   temaAdi: { fontSize: 13, fontWeight: '800', textAlign: 'center' },
   surum: { textAlign: 'center', marginTop: 24, fontSize: 12 },
 });

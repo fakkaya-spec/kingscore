@@ -2,6 +2,7 @@
 // Fiyat mağazadan dinamik okunur. Karanlık desen yok; X ile kapatınca hiçbir şey kaybolmaz.
 
 import { Stack, useRouter } from 'expo-router';
+import { Check, Crown, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
@@ -40,7 +41,7 @@ export default function PaywallEkrani() {
     setIslemde(false);
     if (basarili) {
       basariTitret();
-      Alert.alert('Hoş geldin! 👑', 'King Skor Pro aktif. İyi oyunlar!');
+      Alert.alert('Hoş geldin!', 'King Skor Pro aktif. İyi oyunlar!');
     }
   };
 
@@ -49,7 +50,7 @@ export default function PaywallEkrani() {
     const bulundu = await geriYukle();
     setIslemde(false);
     Alert.alert(
-      bulundu ? 'Geri yüklendi 👑' : 'Satın alım bulunamadı',
+      bulundu ? 'Geri yüklendi' : 'Satın alım bulunamadı',
       bulundu ? 'King Skor Pro aktif.' : 'Bu hesapla yapılmış bir satın alım bulunamadı.',
     );
   };
@@ -61,7 +62,7 @@ export default function PaywallEkrani() {
       onPress={() => router.back()}
       style={stiller.kapatTusu}
     >
-      <Text style={{ color: r.altin, fontSize: 22, fontWeight: '800' }}>✕</Text>
+      <X color={r.altin} size={24} strokeWidth={2.5} />
     </Pressable>
   );
 
@@ -69,7 +70,7 @@ export default function PaywallEkrani() {
     return (
       <View style={[stiller.merkez, { backgroundColor: r.zemin }]}>
         <Stack.Screen options={{ headerRight: () => kapatmaTusu }} />
-        <Text style={stiller.buyukEmoji}>👑</Text>
+        <Crown color={r.altin} size={72} strokeWidth={1.75} />
         <Text style={[stiller.tesekkur, { color: r.metin }]}>King Skor Pro aktif. İyi oyunlar!</Text>
       </View>
     );
@@ -98,9 +99,10 @@ export default function PaywallEkrani() {
 
       <View style={stiller.ozellikler}>
         {OZELLIKLER.map((o) => (
-          <Text key={o} style={[stiller.ozellik, { color: r.metin }]}>
-            ✓ {o}
-          </Text>
+          <View key={o} style={stiller.ozellikSatiri}>
+            <Check color={r.altin} size={18} strokeWidth={3} />
+            <Text style={[stiller.ozellik, { color: r.metin }]}>{o}</Text>
+          </View>
         ))}
       </View>
 
@@ -155,6 +157,7 @@ const stiller = StyleSheet.create({
   fiyat: { fontSize: 40, fontWeight: '900', marginVertical: 6, fontVariant: ['tabular-nums'] },
   urunAciklama: { fontSize: 14, textAlign: 'center', lineHeight: 20, fontWeight: '600' },
   ozellikler: { gap: 8, marginTop: 18, alignSelf: 'center' },
+  ozellikSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   ozellik: { fontSize: 16, fontWeight: '600' },
   magazaUyari: { textAlign: 'center', marginTop: 14, fontSize: 13 },
   aralik: { marginTop: 12 },
@@ -162,6 +165,5 @@ const stiller = StyleSheet.create({
   baglanti: { fontSize: 13, fontWeight: '700', textDecorationLine: 'underline', padding: 8 },
   kapatTusu: { minWidth: 48, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   merkez: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  buyukEmoji: { fontSize: 72 },
   tesekkur: { fontSize: 18, fontWeight: '700' },
 });

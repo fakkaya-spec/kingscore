@@ -1,3 +1,4 @@
+import { Crown } from 'lucide-react-native';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { elBasligi, kalanHaklar, toplamSkorlar } from '@/core/skor';
@@ -64,7 +65,7 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
               {masa.oyuncular.map((o) => {
                 const puan = el.puanlar[o.id] ?? 0;
                 return (
-                  <View key={o.id} style={stiller.hucre}>
+                  <View key={o.id} style={[stiller.hucre, stiller.puanHucresi]}>
                     <Text
                       style={[
                         stiller.puan,
@@ -72,8 +73,10 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
                       ]}
                     >
                       {puan > 0 ? `+${puan}` : puan}
-                      {kingciId === o.id ? ' 👑' : ''}
                     </Text>
+                    {kingciId === o.id && (
+                      <Crown color={r.altin} size={14} strokeWidth={2.5} />
+                    )}
                   </View>
                 );
               })}
@@ -118,6 +121,7 @@ const stiller = StyleSheet.create({
   },
   elSutunu: { width: 92 },
   hucre: { flex: 1, alignItems: 'center' },
+  puanHucresi: { flexDirection: 'row', justifyContent: 'center', gap: 3 },
   oyuncuAdi: { fontSize: 14, fontWeight: '800' },
   haklar: { fontSize: 11, marginTop: 2, letterSpacing: 1 },
   elAdi: { fontSize: 12, fontWeight: '600' },
