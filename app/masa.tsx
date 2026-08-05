@@ -50,23 +50,22 @@ function GenelGorunum({ masa }: { masa: Masa }) {
           >
             <View style={stiller.genelAdSatiri}>
               <Avatar emoji={oyuncu.emoji} foto={oyuncu.foto} boyut={30} />
-              <View style={stiller.genelAdSutunu}>
-                <Text
-                  numberOfLines={1}
-                  style={[stiller.genelAd, { color: liderMi ? r.kartUstu : r.metin }]}
-                >
-                  {oyuncu.ad}
-                </Text>
-                {/* Kalan haklar: koz yuvarlak, ceza üçgen (detaylı ile aynı dil) */}
-                <View style={stiller.genelHaklar}>
-                  <Text style={[stiller.genelHakMetni, { color: r.altin }]}>
-                    {'●'.repeat(haklar[oyuncu.id]?.koz ?? 0)}
-                  </Text>
-                  <Text style={[stiller.genelHakMetni, { color: r.kirmizi }]}>
-                    {'▲'.repeat(haklar[oyuncu.id]?.ceza ?? 0)}
-                  </Text>
-                </View>
-              </View>
+              <Text
+                numberOfLines={1}
+                style={[stiller.genelAd, { color: liderMi ? r.kartUstu : r.metin }]}
+              >
+                {oyuncu.ad}
+              </Text>
+            </View>
+            {/* Kalan haklar isim ile skor arasında kendi sütununda:
+                koz yuvarlak (üstte), ceza üçgen (altta) — detaylı ile aynı dil */}
+            <View style={stiller.genelHaklar}>
+              <Text style={[stiller.genelHakMetni, { color: r.altin }]}>
+                {'●'.repeat(haklar[oyuncu.id]?.koz ?? 0)}
+              </Text>
+              <Text style={[stiller.genelHakMetni, { color: r.kirmizi }]}>
+                {'▲'.repeat(haklar[oyuncu.id]?.ceza ?? 0)}
+              </Text>
             </View>
             <Text
               style={[
@@ -339,10 +338,9 @@ const stiller = StyleSheet.create({
     flexShrink: 1,
     marginRight: 12,
   },
-  genelAdSutunu: { flexShrink: 1 },
   genelAd: { fontSize: 24, fontWeight: '800', flexShrink: 1 },
-  genelHaklar: { flexDirection: 'row', gap: 6, marginTop: 1 },
-  genelHakMetni: { fontSize: 12, fontWeight: '700', letterSpacing: 1.5 },
+  genelHaklar: { alignItems: 'center', gap: 2, marginHorizontal: 10 },
+  genelHakMetni: { fontSize: 17, fontWeight: '700', letterSpacing: 2, lineHeight: 20 },
   genelPuan: { fontSize: 44, fontWeight: '900', fontVariant: ['tabular-nums'] },
   kalanOyunSatiri: {
     flexDirection: 'row',
