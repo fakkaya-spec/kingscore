@@ -149,12 +149,26 @@ export function secilebilirOyunlar(masa: Masa, oyuncuId: string): OyunSecenegi[]
 }
 
 /**
- * Sıradaki oyuncu. Dağıtım saat yönünün tersine döner:
- * oyuncular dizisi masadaki oturma sırası kabul edilir, her el bir sonraki oyuncuya geçer.
+ * Sıradaki oyuncu: son eli söyleyenin bir sonrası (oturma sırasına göre).
+ * El silme/düzenleme rotasyonu kaydırmış olabilir; bu yüzden el sayısına değil
+ * son elin söyleyenine bakılır ve hakkı kalmayan oyuncu atlanır — böylece
+ * "sıra hakkı bitmiş oyuncuda" kilitlenmesi yaşanmaz.
  */
 export function siradakiOyuncu(masa: Masa): Oyuncu | undefined {
   if (masa.eller.length >= TOPLAM_EL_SAYISI) return undefined;
-  return masa.oyuncular[masa.eller.length % 4];
+  const haklar = kalanHaklar(masa);
+  const sonEl = masa.eller[masa.eller.length - 1];
+  const sonIndeks = sonEl
+    ? masa.oyuncular.findIndex((o) => o.id === sonEl.secenOyuncuId)
+    : -1;
+  for (let adim = 1; adim <= 4; adim += 1) {
+    const aday = masa.oyuncular[(sonIndeks + adim + 4) % 4];
+    const hak = haklar[aday.id];
+    // Hakkı olan her oyuncunun seçebileceği bir oyun mutlaka vardır:
+    // ceza hakkı varsa masadaki 12 ceza slotunun tamamı dolmuş olamaz.
+    if ((hak?.koz ?? 0) > 0 || (hak?.ceza ?? 0) > 0) return aday;
+  }
+  return undefined; // kimsenin hakkı kalmamış (tutarsız kayıt) — güvenli çıkış
 }
 
 /** Oyuncu başına toplam skor. */

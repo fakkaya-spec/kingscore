@@ -292,6 +292,25 @@ describe('kalanHaklar / secilebilirOyunlar / siradakiOyuncu', () => {
     expect(siradakiOyuncu(masa)).toBeUndefined();
     expect(oyunBittiMi(masa)).toBe(true);
   });
+
+  test('el silme rotasyonu kaydırsa bile sıra hakkı biten oyuncuyu atlar (kilitlenme yok)', () => {
+    // o3 beş hakkını da kullanmış; son eli o2 söylemiş.
+    // Normal rotasyonda sıra o3'e gelirdi ama hakkı yok — o4'e atlamalı.
+    const masa = masaYap([
+      elYap('KOZ', { o3: 13, o1: 0, o2: 0, o4: 0 }, 'o3', 'KUPA'),
+      elYap('KOZ', { o3: 13, o1: 0, o2: 0, o4: 0 }, 'o3', 'MACA'),
+      elYap('EL_ALMAZ', { o3: 13, o1: 0, o2: 0, o4: 0 }, 'o3'),
+      elYap('KUPA_ALMAZ', { o3: 13, o1: 0, o2: 0, o4: 0 }, 'o3'),
+      elYap('KIZ_ALMAZ', { o3: 4, o1: 0, o2: 0, o4: 0 }, 'o3'),
+      elYap('SON_IKI', { o1: 2, o2: 0, o3: 0, o4: 0 }, 'o1'),
+      elYap('ERKEK_ALMAZ', { o2: 8, o1: 0, o3: 0, o4: 0 }, 'o2'),
+    ]);
+    const sirali = siradakiOyuncu(masa);
+    expect(sirali!.id).toBe('o4');
+    // Sıradaki oyuncunun seçebileceği en az bir oyun mutlaka olmalı
+    const secenekler = secilebilirOyunlar(masa, sirali!.id);
+    expect(secenekler.some((s) => s.secilebilir)).toBe(true);
+  });
 });
 
 // ---------- toplamlar ve altın kural ----------
