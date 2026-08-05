@@ -15,6 +15,7 @@ export interface Oyuncu {
   id: string;
   ad: string;
   emoji: string;
+  foto?: string; // cihazdaki fotoğraf dosyasının yolu; yoksa emoji gösterilir
 }
 
 /** Birim puanlar. Cezalar negatif tutulur (ör. kupaAlmaz = -30). */

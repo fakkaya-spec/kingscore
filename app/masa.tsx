@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Avatar } from '@/bilesenler/Avatar';
 import { Buton } from '@/bilesenler/Buton';
 import { SkorTablosu } from '@/bilesenler/SkorTablosu';
 import { kalanOyunOzeti } from '@/core/kalanOyun';
@@ -46,12 +47,15 @@ function GenelGorunum({ masa }: { masa: Masa }) {
               liderMi && { backgroundColor: r.kart },
             ]}
           >
-            <Text
-              numberOfLines={1}
-              style={[stiller.genelAd, { color: liderMi ? r.kartUstu : r.metin }]}
-            >
-              {oyuncu.emoji} {oyuncu.ad}
-            </Text>
+            <View style={stiller.genelAdSatiri}>
+              <Avatar emoji={oyuncu.emoji} foto={oyuncu.foto} boyut={30} />
+              <Text
+                numberOfLines={1}
+                style={[stiller.genelAd, { color: liderMi ? r.kartUstu : r.metin }]}
+              >
+                {oyuncu.ad}
+              </Text>
+            </View>
             <Text
               style={[
                 stiller.genelPuan,
@@ -233,9 +237,10 @@ export default function MasaEkrani() {
           entering={animasyonlar ? FadeInDown.springify().damping(15) : undefined}
           style={[stiller.siraBandi, { backgroundColor: r.altin }]}
         >
-          <Text style={stiller.siraMetni}>
-            SIRA: {sirali.emoji} {sirali.ad.toLocaleUpperCase('tr')}
-          </Text>
+          <View style={stiller.siraSatiri}>
+            <Avatar emoji={sirali.emoji} foto={sirali.foto} boyut={24} />
+            <Text style={stiller.siraMetni}>SIRA: {sirali.ad.toLocaleUpperCase('tr')}</Text>
+          </View>
           <Text style={stiller.siraAlt}>
             {masa.eller.length + 1}. el · {20 - masa.eller.length} el kaldı
           </Text>
@@ -280,7 +285,14 @@ const stiller = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 16,
   },
-  genelAd: { fontSize: 24, fontWeight: '800', flexShrink: 1, marginRight: 12 },
+  genelAdSatiri: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 1,
+    marginRight: 12,
+  },
+  genelAd: { fontSize: 24, fontWeight: '800', flexShrink: 1 },
   genelPuan: { fontSize: 44, fontWeight: '900', fontVariant: ['tabular-nums'] },
   kalanOyunSatiri: {
     flexDirection: 'row',
@@ -306,6 +318,7 @@ const stiller = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
+  siraSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   siraMetni: { fontSize: 22, fontWeight: '900', color: '#1A1A1A', letterSpacing: 1 },
   siraAlt: { fontSize: 13, color: '#1A1A1A', opacity: 0.75, marginTop: 2 },
   duzeltmeIpucu: { fontSize: 11, textAlign: 'center', marginTop: 6 },

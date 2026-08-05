@@ -25,6 +25,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { Avatar } from '@/bilesenler/Avatar';
 import { Buton } from '@/bilesenler/Buton';
 import { Konfeti } from '@/bilesenler/Konfeti';
 import { SkorTablosu } from '@/bilesenler/SkorTablosu';
@@ -209,9 +210,12 @@ export default function SonucEkrani() {
                     {sonuncu && <Bird color={r.kirmizi} size={24} strokeWidth={2.25} />}
                   </View>
                   <Text style={[stiller.siraNo, { color: r.soluk }]}>{satir.sira}.</Text>
-                  <Text style={[stiller.siraAd, { color: r.metin }]} numberOfLines={1}>
-                    {satir.oyuncu.emoji} {satir.oyuncu.ad}
-                  </Text>
+                  <View style={stiller.siraAdSatiri}>
+                    <Avatar emoji={satir.oyuncu.emoji} foto={satir.oyuncu.foto} boyut={24} />
+                    <Text style={[stiller.siraAd, { color: r.metin }]} numberOfLines={1}>
+                      {satir.oyuncu.ad}
+                    </Text>
+                  </View>
                   {satir.kingSayisi > 0 && (
                     <View style={stiller.kingRozetleri}>
                       {Array.from({ length: satir.kingSayisi }, (_, k) => (
@@ -322,7 +326,8 @@ const stiller = StyleSheet.create({
   rozetAlani: { width: 34, alignItems: 'center' },
   kingRozetleri: { flexDirection: 'row', gap: 2 },
   siraNo: { fontSize: 18, fontWeight: '800', width: 26, fontVariant: ['tabular-nums'] },
-  siraAd: { flex: 1, fontSize: 19, fontWeight: '800' },
+  siraAdSatiri: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 7 },
+  siraAd: { fontSize: 19, fontWeight: '800', flexShrink: 1 },
   siraPuan: { fontSize: 24, fontWeight: '900', fontVariant: ['tabular-nums'] },
   istKutusu: {
     borderWidth: 1,

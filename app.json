@@ -33,7 +33,13 @@
     "plugins": [
       "expo-router",
       "expo-sharing",
-      "expo-audio"
+      "expo-audio",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Oyuncu kartlarına fotoğraf eklemek için galerinize erişim gerekir. Fotoğraflar yalnızca cihazınızda saklanır."
+        }
+      ]
     ]
   }
 }

@@ -9,13 +9,14 @@ export interface HavuzOyuncusu {
   id: string;
   ad: string;
   emoji: string;
+  foto?: string; // cihazdaki fotoğraf dosyasının yolu (opsiyonel)
 }
 
 interface HavuzDurumu {
   havuz: HavuzOyuncusu[];
 
-  havuzaEkle: (ad: string, emoji: string) => HavuzOyuncusu;
-  havuzdaGuncelle: (id: string, ad: string, emoji: string) => void;
+  havuzaEkle: (ad: string, emoji: string, foto?: string) => HavuzOyuncusu;
+  havuzdaGuncelle: (id: string, ad: string, emoji: string, foto?: string) => void;
   havuzdanSil: (id: string) => void;
 }
 
@@ -24,15 +25,15 @@ export const useOyuncuHavuzuStore = create<HavuzDurumu>()(
     (set) => ({
       havuz: [],
 
-      havuzaEkle: (ad, emoji) => {
-        const oyuncu: HavuzOyuncusu = { id: kimlikUret(), ad: ad.trim(), emoji };
+      havuzaEkle: (ad, emoji, foto) => {
+        const oyuncu: HavuzOyuncusu = { id: kimlikUret(), ad: ad.trim(), emoji, foto };
         set((d) => ({ havuz: [...d.havuz, oyuncu] }));
         return oyuncu;
       },
 
-      havuzdaGuncelle: (id, ad, emoji) =>
+      havuzdaGuncelle: (id, ad, emoji, foto) =>
         set((d) => ({
-          havuz: d.havuz.map((o) => (o.id === id ? { ...o, ad: ad.trim(), emoji } : o)),
+          havuz: d.havuz.map((o) => (o.id === id ? { ...o, ad: ad.trim(), emoji, foto } : o)),
         })),
 
       havuzdanSil: (id) =>

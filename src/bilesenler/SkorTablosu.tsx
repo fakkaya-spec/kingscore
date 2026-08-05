@@ -1,6 +1,7 @@
 import { Crown } from 'lucide-react-native';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Avatar } from './Avatar';
 import { elBasligi, kalanHaklar, toplamSkorlar } from '@/core/skor';
 import type { El, Masa } from '@/core/tipler';
 import { useRenkler } from '@/tema/renkler';
@@ -26,9 +27,12 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
         </View>
         {masa.oyuncular.map((o) => (
           <View key={o.id} style={stiller.hucre}>
-            <Text style={[stiller.oyuncuAdi, { color: r.altin }]} numberOfLines={1}>
-              {o.emoji} {o.ad}
-            </Text>
+            <View style={stiller.oyuncuBasligi}>
+              <Avatar emoji={o.emoji} foto={o.foto} boyut={18} />
+              <Text style={[stiller.oyuncuAdi, { color: r.altin }]} numberOfLines={1}>
+                {o.ad}
+              </Text>
+            </View>
             {hakGoster && (
               <Text style={[stiller.haklar, { color: r.soluk }]}>
                 {'♠'.repeat(haklar[o.id]?.koz ?? 0)}
@@ -125,7 +129,8 @@ const stiller = StyleSheet.create({
   elBaslik: { fontSize: 12, fontWeight: '900', letterSpacing: 1 },
   hucre: { flex: 1, alignItems: 'center' },
   puanHucresi: { flexDirection: 'row', justifyContent: 'center', gap: 3 },
-  oyuncuAdi: { fontSize: 14, fontWeight: '800' },
+  oyuncuBasligi: { flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: '100%' },
+  oyuncuAdi: { fontSize: 14, fontWeight: '800', flexShrink: 1 },
   haklar: { fontSize: 11, marginTop: 2, letterSpacing: 1 },
   elAdi: { fontSize: 12, fontWeight: '600' },
   puan: { fontSize: 17, fontWeight: '700', fontVariant: ['tabular-nums'] },

@@ -14,9 +14,11 @@ import {
   View,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Avatar } from '@/bilesenler/Avatar';
 import { Buton } from '@/bilesenler/Buton';
 import { OYUNCU_EMOJILERI } from '@/core/sabitler';
 import type { Oyuncu } from '@/core/tipler';
+import { fotoSec, fotoSil } from '@/servisler/foto';
 import { davetPaylas } from '@/servisler/paylas';
 import { hafifTitret } from '@/servisler/titresim';
 import { kimlikUret } from '@/store/depo';
@@ -43,6 +45,9 @@ export default function OyuncularEkrani() {
   const [duzenlenenId, setDuzenlenenId] = useState<string | null>(null);
   const [formAd, setFormAd] = useState('');
   const [formEmoji, setFormEmoji] = useState(OYUNCU_EMOJILERI[0]);
+  const [formFoto, setFormFoto] = useState<string | undefined>(undefined);
+  // Düzenlenen oyuncunun kayıtlı fotoğrafı: vazgeçilirse dosyası korunmalı
+  const [eskiFoto, setEskiFoto] = useState<string | undefined>(undefined);
 
   // Hızlı giriş (havuz 4 kişiden azken eski yol)
   const [adlar, setAdlar] = useState<string[]>(['', '', '', '']);
@@ -95,6 +100,7 @@ export default function OyuncularEkrani() {
       id: kimlikUret(),
       ad: o.ad,
       emoji: o.emoji,
+      foto: o.foto,
     })) as [Oyuncu, Oyuncu, Oyuncu, Oyuncu];
     baslat(oyuncular, masaAdi);
   };
@@ -106,7 +112,27 @@ export default function OyuncularEkrani() {
     setDuzenlenenId(oyuncu?.id ?? null);
     setFormAd(oyuncu?.ad ?? '');
     setFormEmoji(oyuncu?.emoji ?? bosEmoji());
+    setFormFoto(oyuncu?.foto);
+    setEskiFoto(oyuncu?.foto);
     setFormAcik(true);
+  };
+
+  const formFotoSec = async () => {
+    const uri = await fotoSec();
+    if (!uri) return;
+    // Bu oturumda seçilmiş ama kaydedilmemiş fotoğraf varsa dosyası artık gereksiz
+    if (formFoto && formFoto !== eskiFoto) fotoSil(formFoto);
+    setFormFoto(uri);
+  };
+
+  const formuKapat = (kaydedildi: boolean) => {
+    if (!kaydedildi && formFoto && formFoto !== eskiFoto) fotoSil(formFoto); // vazgeçildi: yeni seçim çöpe
+    if (kaydedildi && eskiFoto && eskiFoto !== formFoto) fotoSil(eskiFoto); // kaydedildi: eski dosya çöpe
+    setFormAcik(false);
+    setDuzenlenenId(null);
+    setFormAd('');
+    setFormFoto(undefined);
+    setEskiFoto(undefined);
   };
 
   const formuKaydet = () => {
@@ -121,21 +147,20 @@ export default function OyuncularEkrani() {
       Alert.alert('İsim zaten var', 'Havuzdaki her oyuncunun adı farklı olmalı.');
       return;
     }
-    if (duzenlenenId) havuzdaGuncelle(duzenlenenId, ad, formEmoji);
-    else havuzaEkle(ad, formEmoji);
-    setFormAcik(false);
-    setDuzenlenenId(null);
-    setFormAd('');
+    if (duzenlenenId) havuzdaGuncelle(duzenlenenId, ad, formEmoji, formFoto);
+    else havuzaEkle(ad, formEmoji, formFoto);
+    formuKapat(true);
   };
 
   const uzunBas = (oyuncu: HavuzOyuncusu) => {
-    Alert.alert(`${oyuncu.emoji} ${oyuncu.ad}`, undefined, [
+    Alert.alert(oyuncu.ad, undefined, [
       { text: 'Düzenle', onPress: () => formuAc(oyuncu) },
       {
         text: 'Havuzdan Sil',
         style: 'destructive',
         onPress: () => {
           setSeciliIdler((s) => s.filter((id) => id !== oyuncu.id));
+          fotoSil(oyuncu.foto);
           havuzdanSil(oyuncu.id);
         },
       },
@@ -211,7 +236,7 @@ export default function OyuncularEkrani() {
                     },
                   ]}
                 >
-                  <Text style={stiller.kartEmoji}>{oyuncu.emoji}</Text>
+                  <Avatar emoji={oyuncu.emoji} foto={oyuncu.foto} boyut={34} />
                   <Text
                     numberOfLines={1}
                     style={[stiller.kartAd, { color: secili ? r.kartUstu : r.metin }]}
@@ -255,7 +280,7 @@ export default function OyuncularEkrani() {
       {formAcik && (
         <View style={[stiller.form, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}>
           <View style={stiller.formSatiri}>
-            <Text style={stiller.kartEmoji}>{formEmoji}</Text>
+            <Avatar emoji={formEmoji} foto={formFoto} boyut={40} />
             <TextInput
               value={formAd}
               onChangeText={setFormAd}
@@ -268,6 +293,25 @@ export default function OyuncularEkrani() {
                 { backgroundColor: r.zemin, color: r.metin, borderColor: r.cizgi },
               ]}
             />
+          </View>
+          <View style={stiller.formSatiri}>
+            <Buton
+              baslik={formFoto ? 'Fotoğrafı Değiştir' : 'Fotoğraf Ekle'}
+              tur="ikincil"
+              onPress={() => formFotoSec()}
+              stil={stiller.esit}
+            />
+            {formFoto && (
+              <Buton
+                baslik="Fotoğrafı Kaldır"
+                tur="ikincil"
+                onPress={() => {
+                  if (formFoto !== eskiFoto) fotoSil(formFoto);
+                  setFormFoto(undefined);
+                }}
+                stil={stiller.esit}
+              />
+            )}
           </View>
           <View style={stiller.emojiPaleti}>
             {OYUNCU_EMOJILERI.map((e) => (
@@ -282,7 +326,7 @@ export default function OyuncularEkrani() {
             <Buton
               baslik="Vazgeç"
               tur="ikincil"
-              onPress={() => setFormAcik(false)}
+              onPress={() => formuKapat(false)}
               stil={stiller.esit}
             />
             <Buton
