@@ -2,6 +2,10 @@
 
 İskambil **King** oyunu için skor takip uygulaması. Kağıt kalem yok, hesap tartışması yok.
 
+> **Resmi App Store adı:** "King Skor Cetele" (App Store Connect'te böyle kayıtlı).
+> Cihazda ikon altındaki ad bilinçli olarak kısa tutulur: "King Skor"
+> (iOS uzun adları kırptığı için).
+
 - **Sunucu yok** — tüm veri cihazda (MMKV), uçak modunda %100 çalışır
 - **Reklam yok, analytics yok, izin istemez**
 - Sadece Türkçe, para birimi ₺
