@@ -12,7 +12,7 @@ import { Buton } from '@/bilesenler/Buton';
 import { SkorTablosu } from '@/bilesenler/SkorTablosu';
 import { kalanOyunOzeti } from '@/core/kalanOyun';
 import { OYUN_ADI } from '@/core/sabitler';
-import { elBasligi, oyunBittiMi, siradakiOyuncu, toplamSkorlar } from '@/core/skor';
+import { elBasligi, kalanHaklar, oyunBittiMi, siradakiOyuncu, toplamSkorlar } from '@/core/skor';
 import type { El, Masa } from '@/core/tipler';
 import { ortaTitret } from '@/servisler/titresim';
 import { useAyarStore, type MasaGorunumu } from '@/store/ayarStore';
@@ -24,6 +24,7 @@ function GenelGorunum({ masa }: { masa: Masa }) {
   const r = useRenkler();
   const animasyonlar = useAyarStore((d) => d.animasyonlar);
   const toplamlar = toplamSkorlar(masa);
+  const haklar = kalanHaklar(masa);
   const sirali = [...masa.oyuncular].sort(
     (a, b) => (toplamlar[b.id] ?? 0) - (toplamlar[a.id] ?? 0),
   );
@@ -49,12 +50,23 @@ function GenelGorunum({ masa }: { masa: Masa }) {
           >
             <View style={stiller.genelAdSatiri}>
               <Avatar emoji={oyuncu.emoji} foto={oyuncu.foto} boyut={30} />
-              <Text
-                numberOfLines={1}
-                style={[stiller.genelAd, { color: liderMi ? r.kartUstu : r.metin }]}
-              >
-                {oyuncu.ad}
-              </Text>
+              <View style={stiller.genelAdSutunu}>
+                <Text
+                  numberOfLines={1}
+                  style={[stiller.genelAd, { color: liderMi ? r.kartUstu : r.metin }]}
+                >
+                  {oyuncu.ad}
+                </Text>
+                {/* Kalan haklar: koz yuvarlak, ceza üçgen (detaylı ile aynı dil) */}
+                <View style={stiller.genelHaklar}>
+                  <Text style={[stiller.genelHakMetni, { color: r.altin }]}>
+                    {'●'.repeat(haklar[oyuncu.id]?.koz ?? 0)}
+                  </Text>
+                  <Text style={[stiller.genelHakMetni, { color: r.kirmizi }]}>
+                    {'▲'.repeat(haklar[oyuncu.id]?.ceza ?? 0)}
+                  </Text>
+                </View>
+              </View>
             </View>
             <Text
               style={[
@@ -327,7 +339,10 @@ const stiller = StyleSheet.create({
     flexShrink: 1,
     marginRight: 12,
   },
+  genelAdSutunu: { flexShrink: 1 },
   genelAd: { fontSize: 24, fontWeight: '800', flexShrink: 1 },
+  genelHaklar: { flexDirection: 'row', gap: 6, marginTop: 1 },
+  genelHakMetni: { fontSize: 12, fontWeight: '700', letterSpacing: 1.5 },
   genelPuan: { fontSize: 44, fontWeight: '900', fontVariant: ['tabular-nums'] },
   kalanOyunSatiri: {
     flexDirection: 'row',

@@ -25,6 +25,7 @@ export default function GecmisEkrani() {
   const r = useRenkler();
   const gecmis = useMasaStore((d) => d.gecmis);
   const gecmistenSil = useMasaStore((d) => d.gecmistenSil);
+  const gecmisiSilIdler = useMasaStore((d) => d.gecmisiSilIdler);
   const tumGecmisiSil = useMasaStore((d) => d.tumGecmisiSil);
   const proMu = usePro();
   const [donem, setDonem] = useState<Donem>('tum');
@@ -45,13 +46,20 @@ export default function GecmisEkrani() {
     [proMu, filtreli],
   );
 
-  const hepsiniSil = () => {
+  // Silme, üstteki dönem sekmesine uyar: Bugün / Son 7 Gün / Tümü
+  const donemAdi = DONEMLER.find((d) => d.deger === donem)!.ad;
+  const donemiSil = () => {
     Alert.alert(
-      'Tüm geçmişi sil',
-      `${gecmis.length} masa kalıcı olarak silinecek. Önce yedek almak isteyebilirsin. Emin misin?`,
+      donem === 'tum' ? 'Tüm geçmişi sil' : `${donemAdi} geçmişini sil`,
+      `${filtreli.length} masa kalıcı olarak silinecek. Önce yedek almak isteyebilirsin. Emin misin?`,
       [
         { text: 'Vazgeç', style: 'cancel' },
-        { text: 'Hepsini Sil', style: 'destructive', onPress: tumGecmisiSil },
+        {
+          text: `Sil (${filtreli.length} masa)`,
+          style: 'destructive',
+          onPress: () =>
+            donem === 'tum' ? tumGecmisiSil() : gecmisiSilIdler(filtreli.map((m) => m.id)),
+        },
       ],
     );
   };
@@ -196,8 +204,13 @@ export default function GecmisEkrani() {
       <View style={stiller.altAlan}>
         <Buton baslik="Yedeği Dışa Aktar" tur="ikincil" onPress={() => disaAktar()} />
         <Buton baslik="Yedekten İçe Aktar" tur="ikincil" onPress={iceAl} stil={stiller.aralik} />
-        {proMu && gecmis.length > 0 && (
-          <Buton baslik="Tüm Geçmişi Sil" tur="tehlike" onPress={hepsiniSil} stil={stiller.aralik} />
+        {proMu && filtreli.length > 0 && (
+          <Buton
+            baslik={donem === 'tum' ? 'Tüm Geçmişi Sil' : `Geçmişi Sil: ${donemAdi}`}
+            tur="tehlike"
+            onPress={donemiSil}
+            stil={stiller.aralik}
+          />
         )}
       </View>
     </View>

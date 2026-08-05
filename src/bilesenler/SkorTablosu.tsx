@@ -77,6 +77,9 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
                 return (
                   <View key={o.id} style={[stiller.hucre, stiller.puanHucresi]}>
                     <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.7}
                       style={[
                         stiller.puan,
                         { color: puan > 0 ? r.yesil : puan < 0 ? r.kirmizi : r.soluk },
@@ -95,16 +98,21 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
         })}
       </ScrollView>
 
-      {/* KALAN toplam satırı */}
+      {/* SKOR toplam satırı */}
       <View style={[stiller.satir, stiller.kalanSatiri, { borderTopColor: r.altin }]}>
         <View style={stiller.elSutunu}>
-          <Text style={[stiller.kalanBaslik, { color: r.altin }]}>KALAN</Text>
+          <Text style={[stiller.kalanBaslik, { color: r.altin }]}>SKOR</Text>
         </View>
         {masa.oyuncular.map((o) => {
           const t = toplamlar[o.id] ?? 0;
           return (
-            <View key={o.id} style={stiller.hucre}>
-              <Text style={[stiller.kalanPuan, { color: t > 0 ? r.yesil : t < 0 ? r.kirmizi : r.metin }]}>
+            <View key={o.id} style={[stiller.hucre, stiller.kalanHucresi]}>
+              <Text
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.6}
+                style={[stiller.kalanPuan, { color: t > 0 ? r.yesil : t < 0 ? r.kirmizi : r.metin }]}
+              >
                 {t > 0 ? `+${t}` : t}
               </Text>
             </View>
@@ -142,5 +150,6 @@ const stiller = StyleSheet.create({
   bosMetin: { textAlign: 'center', padding: 24, fontSize: 15 },
   kalanSatiri: { borderTopWidth: 2, paddingVertical: 12 },
   kalanBaslik: { fontSize: 15, fontWeight: '900', letterSpacing: 1 },
+  kalanHucresi: { paddingHorizontal: 2 },
   kalanPuan: { fontSize: 22, fontWeight: '900', fontVariant: ['tabular-nums'] },
 });

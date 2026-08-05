@@ -33,6 +33,7 @@ interface MasaDurumu {
   masayiKapat: () => void; // biten masayı geçmişe taşı
   masayiSil: () => void; // aktif masayı tamamen iptal et
   gecmistenSil: (masaId: string) => void;
+  gecmisiSilIdler: (idler: string[]) => void; // dönem bazlı toplu silme
   tumGecmisiSil: () => void;
   gecmisiIceAktar: (masalar: Masa[]) => void;
 }
@@ -136,6 +137,12 @@ export const useMasaStore = create<MasaDurumu>()(
 
       gecmistenSil: (masaId) =>
         set((d) => ({ gecmis: d.gecmis.filter((m) => m.id !== masaId) })),
+
+      gecmisiSilIdler: (idler) =>
+        set((d) => {
+          const silinecek = new Set(idler);
+          return { gecmis: d.gecmis.filter((m) => !silinecek.has(m.id)) };
+        }),
 
       tumGecmisiSil: () => set({ gecmis: [] }),
 
