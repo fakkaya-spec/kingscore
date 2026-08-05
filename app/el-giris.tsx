@@ -34,7 +34,9 @@ export default function ElGirisEkrani() {
   const duzenlenenEl = masa?.eller.find((el) => el.id === params.elId);
 
   const [adetler, setAdetler] = useState<Record<string, number>>(() => {
-    if (duzenlenenEl) return { ...duzenlenenEl.adetler };
+    // Tür değişmeden düzenlemede eski adetler gelir; tür değiştiyse hedef
+    // birim farklı olacağı için sıfırdan girilir
+    if (duzenlenenEl && duzenlenenEl.tur === tur) return { ...duzenlenenEl.adetler };
     const bos: Record<string, number> = {};
     masa?.oyuncular.forEach((o) => {
       bos[o.id] = 0;
@@ -85,7 +87,7 @@ export default function ElGirisEkrani() {
     basariTitret();
 
     if (duzenlenenEl) {
-      elGuncelle(duzenlenenEl.id, adetler, koz);
+      elGuncelle(duzenlenenEl.id, { tur, koz, adetler });
       router.back();
       return;
     }

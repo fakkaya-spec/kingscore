@@ -1,7 +1,8 @@
 // Oyun seçim ekranı (modal): sıradaki oyuncunun kalan haklarına göre filtrelenmiş kartlar.
 // KOZ seçilirse ikinci adımda 4 koz simgesi gösterilir.
+// elId parametresiyle açılırsa mevcut bir el düzenlenir: oyun türü dahil her şey değişebilir.
 
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
@@ -20,20 +21,32 @@ import { useRenkler } from '@/tema/renkler';
 export default function OyunSecEkrani() {
   const router = useRouter();
   const r = useRenkler();
+  const params = useLocalSearchParams<{ elId?: string }>();
   const masa = useMasaStore((d) => d.aktifMasa);
   const [kozAdimi, setKozAdimi] = useState(false);
 
   if (!masa) return null;
-  const oyuncu = siradakiOyuncu(masa);
+
+  // Düzenleme: elin söyleyeni sabittir; haklar ve masa limitleri bu el
+  // yokmuş gibi hesaplanır ki türü serbestçe değiştirilebilsin.
+  const duzenlenenEl = params.elId
+    ? masa.eller.find((el) => el.id === params.elId)
+    : undefined;
+  const hesapMasa = duzenlenenEl
+    ? { ...masa, eller: masa.eller.filter((el) => el.id !== duzenlenenEl.id) }
+    : masa;
+  const oyuncu = duzenlenenEl
+    ? masa.oyuncular.find((o) => o.id === duzenlenenEl.secenOyuncuId)
+    : siradakiOyuncu(masa);
   if (!oyuncu) return null;
 
-  const secenekler = secilebilirOyunlar(masa, oyuncu.id);
+  const secenekler = secilebilirOyunlar(hesapMasa, oyuncu.id);
 
   const oyunaGit = (tur: OyunTuru, koz?: Koz) => {
     hafifTitret();
     router.replace({
       pathname: '/el-giris',
-      params: { tur, koz: koz ?? '', secen: oyuncu.id },
+      params: { tur, koz: koz ?? '', secen: oyuncu.id, elId: duzenlenenEl?.id ?? '' },
     });
   };
 
@@ -70,7 +83,8 @@ export default function OyunSecEkrani() {
   return (
     <ScrollView style={{ backgroundColor: r.zemin }} contentContainerStyle={stiller.icerik}>
       <Text style={[stiller.baslik, { color: r.metin }]}>
-        {oyuncu.emoji} {oyuncu.ad} — oyununu seç
+        {oyuncu.emoji} {oyuncu.ad} —{' '}
+        {duzenlenenEl ? `${duzenlenenEl.sira}. eli düzenle` : 'oyununu seç'}
       </Text>
       {secenekler.map(({ tur, secilebilir, neden }) => (
         <Pressable

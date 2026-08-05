@@ -24,7 +24,10 @@ interface MasaDurumu {
 
   masaKur: (oyuncular: [Oyuncu, Oyuncu, Oyuncu, Oyuncu], ad?: string) => void;
   elKaydet: (girdi: ElGirdisi) => El;
-  elGuncelle: (elId: string, adetler: Record<string, number>, koz?: Koz) => void;
+  elGuncelle: (
+    elId: string,
+    girdi: { tur: OyunTuru; koz?: Koz; adetler: Record<string, number> },
+  ) => void;
   elSil: (elId: string) => void;
   sonEliGeriAl: () => void;
   masayiKapat: () => void; // biten masayı geçmişe taşı
@@ -83,17 +86,19 @@ export const useMasaStore = create<MasaDurumu>()(
         return el;
       },
 
-      elGuncelle: (elId, adetler, koz) => {
+      // Düzenlemede oyun türü de değişebilir (yanlış tür seçildiyse el silinmez, düzeltilir)
+      elGuncelle: (elId, girdi) => {
         const masa = get().aktifMasa;
         if (!masa) return;
         const eller = masa.eller.map((el) =>
           el.id === elId
             ? {
                 ...el,
-                koz: el.tur === 'KOZ' ? (koz ?? el.koz) : undefined,
-                adetler: { ...adetler },
-                puanlar: puanHesapla({ tur: el.tur, adetler }, masa.puanTablosu),
-                kingMi: kingMi({ tur: el.tur, adetler }),
+                tur: girdi.tur,
+                koz: girdi.tur === 'KOZ' ? girdi.koz : undefined,
+                adetler: { ...girdi.adetler },
+                puanlar: puanHesapla(girdi, masa.puanTablosu),
+                kingMi: kingMi(girdi),
               }
             : el,
         );

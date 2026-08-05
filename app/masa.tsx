@@ -140,23 +140,27 @@ export default function MasaEkrani() {
   const sirali = siradakiOyuncu(masa);
 
   const satirMenusu = (el: El) => {
+    // Ortadan silme rotasyonu bozar; ara eller yalnız düzenlenir (tür dahil),
+    // silme sadece son elde sunulur
+    const sonElMi = masa.eller[masa.eller.length - 1]?.id === el.id;
     Alert.alert(`${el.sira}. ${elBasligi(el)}`, undefined, [
       {
         text: 'Bu eli düzenle',
         onPress: () =>
-          router.push({
-            pathname: '/el-giris',
-            params: { elId: el.id, tur: el.tur, koz: el.koz ?? '', secen: el.secenOyuncuId },
-          }),
+          router.push({ pathname: '/oyun-sec', params: { elId: el.id } }),
       },
-      {
-        text: 'Bu eli sil',
-        style: 'destructive',
-        onPress: () => {
-          ortaTitret();
-          elSil(el.id);
-        },
-      },
+      ...(sonElMi
+        ? [
+            {
+              text: 'Bu eli sil',
+              style: 'destructive' as const,
+              onPress: () => {
+                ortaTitret();
+                elSil(el.id);
+              },
+            },
+          ]
+        : []),
       { text: 'Vazgeç', style: 'cancel' },
     ]);
   };
