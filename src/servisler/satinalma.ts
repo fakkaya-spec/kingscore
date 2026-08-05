@@ -12,7 +12,7 @@ import { useProStore } from '@/store/proStore';
 
 // RevenueCat panosundan alınacak genel (public) SDK anahtarları.
 // Bunlar gizli değildir, uygulamaya gömülmesi RevenueCat'in önerdiği yöntemdir.
-const REVENUECAT_APPLE_KEY = 'appl_XXXXXXXXXXXXXXXX';
+const REVENUECAT_APPLE_KEY = 'appl_mbJlQwWZPeNMMefLUztqRyfjMoj';
 const REVENUECAT_GOOGLE_KEY = 'goog_XXXXXXXXXXXXXXXX';
 
 export const ENTITLEMENT_ADI = 'pro';
