@@ -125,9 +125,10 @@ const stiller = StyleSheet.create({
   satirAciklama: { fontSize: 13, marginTop: 2 },
   aralik: { marginTop: 10 },
   bolum: { fontSize: 15, fontWeight: '900', marginTop: 24, letterSpacing: 1 },
-  temalar: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  temalar: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
   temaKarti: {
-    flex: 1,
+    flexBasis: '47%',
+    flexGrow: 1,
     minHeight: 72,
     borderRadius: 14,
     alignItems: 'center',

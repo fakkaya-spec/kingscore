@@ -34,11 +34,15 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
               </Text>
             </View>
             {hakGoster && (
-              <Text style={[stiller.haklar, { color: r.soluk }]}>
-                {'♠'.repeat(haklar[o.id]?.koz ?? 0)}
-                {' '}
-                {'●'.repeat(haklar[o.id]?.ceza ?? 0)}
-              </Text>
+              // Masadaki gelenek: koz hakkı YUVARLAK, ceza hakkı ÜÇGEN çizilir
+              <View style={stiller.haklarSatiri}>
+                <Text style={[stiller.haklar, { color: r.altin }]}>
+                  {'●'.repeat(haklar[o.id]?.koz ?? 0)}
+                </Text>
+                <Text style={[stiller.haklar, { color: r.kirmizi }]}>
+                  {'▲'.repeat(haklar[o.id]?.ceza ?? 0)}
+                </Text>
+              </View>
             )}
           </View>
         ))}
@@ -131,7 +135,8 @@ const stiller = StyleSheet.create({
   puanHucresi: { flexDirection: 'row', justifyContent: 'center', gap: 3 },
   oyuncuBasligi: { flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: '100%' },
   oyuncuAdi: { fontSize: 14, fontWeight: '800', flexShrink: 1 },
-  haklar: { fontSize: 11, marginTop: 2, letterSpacing: 1 },
+  haklarSatiri: { flexDirection: 'row', gap: 6, marginTop: 3 },
+  haklar: { fontSize: 13, fontWeight: '700', letterSpacing: 1.5 },
   elAdi: { fontSize: 12, fontWeight: '600' },
   puan: { fontSize: 17, fontWeight: '700', fontVariant: ['tabular-nums'] },
   bosMetin: { textAlign: 'center', padding: 24, fontSize: 15 },

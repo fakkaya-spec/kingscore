@@ -8,7 +8,7 @@
 - İki ürün (kullanıcıya görünen ad: **King Skor Premium**):
   **`king_pro_lifetime`** (non-consumable, 299,99 ₺) ve
   **`king_premium_yillik`** (otomatik yenilenen yıllık abonelik, 149,99 ₺)
-- Ücretsiz sınır: **toplam 4 deneme masası** (`UCRETSIZ_MASA_HAKKI`); masa ortasında asla kilit yok
+- Ücretsiz sınır: **toplam 5 deneme masası** (`UCRETSIZ_MASA_HAKKI`); masa ortasında asla kilit yok
 
 ## Teknoloji
 
@@ -112,9 +112,9 @@ assets/sesler/           # sentezlenmiş telifsiz WAV efektleri
   - `king_premium_yillik` — otomatik yenilenen **yıllık** abonelik, **149,99 ₺**.
   - Aylık/haftalık ürün YOK (skor defteri için abonelik baskısı algısı yaratır;
     rakip analizi 2026-08).
-- **Ücretsiz sınır: toplam 4 deneme masası.** Kullanıcı uygulamanın tadına varsın
-  diye ilk 4 masayı (20 elin tamamı, sonuç ekranı, tüm animasyonlar) kısıtsız oynar;
-  5. masada paywall açılır. Sayaç `masaStore.kurulanMasaSayisi` ile tutulur, günlük
+- **Ücretsiz sınır: toplam 5 deneme masası.** Kullanıcı uygulamanın tadına varsın
+  diye ilk 5 masayı (20 elin tamamı, sonuç ekranı, tüm animasyonlar) kısıtsız oynar;
+  6. masada paywall açılır. Sayaç `masaStore.kurulanMasaSayisi` ile tutulur, günlük
   yenilenmez. Başlamış masa **hiçbir koşulda** kilitlenmez.
 - **Premium ile açılanlar:** sınırsız masa, geçmiş masalar + oyuncu istatistikleri
   (en çok rıfkı yiyen, en çok King yapan, ortalamalar), puan tablosu özelleştirme,
@@ -140,8 +140,8 @@ Kod tarafında yapılacak tek şey: `src/servisler/satinalma.ts` içindeki
 3. Uygulama açıklamasının **en altına** Apple'ın standart EULA linkini ekleyin:
    `Kullanım Koşulları: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`
 4. **Small Business Program**'a kayıt olun → komisyon %30 yerine **%15**.
-   Net hesap: 199 ₺ (KDV dahil) → %20 KDV düşünce ~165,8 ₺ → %15 komisyon düşünce
-   geliştiriciye kalan yaklaşık **141 ₺**.
+   Net hesap (KDV %20 + komisyon %15 düştükten sonra): ömür boyu 299,99 ₺ →
+   geliştiriciye ~212 ₺; yıllık 149,99 ₺ → ~106 ₺.
 5. **Review notlarına** şunu yazın: "Uygulama tamamen çevrimdışıdır, hesap gerektirmez,
    veri toplamaz. Test için: ana ekran > Yeni Masa > 4 isim gir > El Gir."
 6. Yaş sınırı **4+**; kumar/bahis içeriği YOK — bu bir skor defteridir, oyun oynatmaz.

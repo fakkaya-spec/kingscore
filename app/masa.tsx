@@ -2,7 +2,7 @@
 
 import { Stack, useRouter } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
-import { Undo2 } from 'lucide-react-native';
+import { House, Undo2 } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -187,6 +187,16 @@ export default function MasaEkrani() {
       <Stack.Screen
         options={{
           title: masa.ad || 'Masa',
+          // Masa kaybolmaz: ana ekrandaki "Devam Et" kartından geri dönülür
+          headerLeft: () => (
+            <Pressable
+              accessibilityLabel="Ana sayfaya dön"
+              onPress={() => router.replace('/')}
+              style={stiller.geriAlTusu}
+            >
+              <House color={r.altin} size={22} strokeWidth={2.25} />
+            </Pressable>
+          ),
           headerRight: () => (
             <Pressable
               accessibilityLabel="Son eli geri al"

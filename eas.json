@@ -20,6 +20,10 @@
         "EXPO_PUBLIC_TEST_PRO": "1"
       }
     },
+    "satis": {
+      "distribution": "internal",
+      "env": {}
+    },
     "simulator": {
       "distribution": "internal",
       "ios": {

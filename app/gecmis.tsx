@@ -3,7 +3,7 @@
 
 import { useRouter } from 'expo-router';
 import { Crown, Lock } from 'lucide-react-native';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
 import { genelIstatistikler, toplamSkorlar } from '@/core/skor';
@@ -12,17 +12,49 @@ import { useMasaStore } from '@/store/masaStore';
 import { usePro } from '@/store/proStore';
 import { useRenkler } from '@/tema/renkler';
 
+type Donem = 'tum' | 'hafta' | 'gun';
+
+const DONEMLER: { deger: Donem; ad: string }[] = [
+  { deger: 'tum', ad: 'Tümü' },
+  { deger: 'hafta', ad: 'Son 7 Gün' },
+  { deger: 'gun', ad: 'Bugün' },
+];
+
 export default function GecmisEkrani() {
   const router = useRouter();
   const r = useRenkler();
   const gecmis = useMasaStore((d) => d.gecmis);
   const gecmistenSil = useMasaStore((d) => d.gecmistenSil);
+  const tumGecmisiSil = useMasaStore((d) => d.tumGecmisiSil);
   const proMu = usePro();
+  const [donem, setDonem] = useState<Donem>('tum');
+
+  // Dönem filtresi hem listeye hem istatistiklere uygulanır
+  const filtreli = useMemo(() => {
+    if (donem === 'tum') return gecmis;
+    const simdi = new Date();
+    const esik =
+      donem === 'gun'
+        ? new Date(simdi.getFullYear(), simdi.getMonth(), simdi.getDate()).getTime()
+        : simdi.getTime() - 7 * 24 * 60 * 60 * 1000;
+    return gecmis.filter((m) => m.baslangic >= esik);
+  }, [gecmis, donem]);
 
   const istatistik = useMemo(
-    () => (proMu && gecmis.length > 0 ? genelIstatistikler(gecmis) : null),
-    [proMu, gecmis],
+    () => (proMu && filtreli.length > 0 ? genelIstatistikler(filtreli) : null),
+    [proMu, filtreli],
   );
+
+  const hepsiniSil = () => {
+    Alert.alert(
+      'Tüm geçmişi sil',
+      `${gecmis.length} masa kalıcı olarak silinecek. Önce yedek almak isteyebilirsin. Emin misin?`,
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        { text: 'Hepsini Sil', style: 'destructive', onPress: tumGecmisiSil },
+      ],
+    );
+  };
 
   const iceAl = async () => {
     const sonuc = await iceAktar();
@@ -33,11 +65,33 @@ export default function GecmisEkrani() {
   return (
     <View style={[stiller.govde, { backgroundColor: r.zemin }]}>
       <FlatList
-        data={gecmis}
+        data={filtreli}
         keyExtractor={(m) => m.id}
         contentContainerStyle={stiller.liste}
         ListHeaderComponent={
           <>
+            {proMu && gecmis.length > 0 && (
+              <View style={[stiller.donemSegmenti, { backgroundColor: r.zeminKoyu, borderColor: r.cizgi }]}>
+                {DONEMLER.map((d) => {
+                  const aktif = donem === d.deger;
+                  return (
+                    <Pressable
+                      key={d.deger}
+                      accessibilityRole="tab"
+                      accessibilityState={{ selected: aktif }}
+                      onPress={() => setDonem(d.deger)}
+                      style={[stiller.donemSekmesi, aktif && { backgroundColor: r.altin }]}
+                    >
+                      <Text
+                        style={[stiller.donemMetni, { color: aktif ? '#1A1A1A' : r.soluk }]}
+                      >
+                        {d.ad}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
             {!proMu && (
               <Pressable
                 onPress={() => router.push('/paywall')}
@@ -86,7 +140,9 @@ export default function GecmisEkrani() {
         }
         ListEmptyComponent={
           <Text style={[stiller.bos, { color: r.soluk }]}>
-            Henüz bitmiş masa yok. İlk masanızı oynayın!
+            {gecmis.length > 0
+              ? 'Bu dönemde bitmiş masa yok.'
+              : 'Henüz bitmiş masa yok. İlk masanızı oynayın!'}
           </Text>
         }
         renderItem={({ item }) => {
@@ -140,6 +196,9 @@ export default function GecmisEkrani() {
       <View style={stiller.altAlan}>
         <Buton baslik="Yedeği Dışa Aktar" tur="ikincil" onPress={() => disaAktar()} />
         <Buton baslik="Yedekten İçe Aktar" tur="ikincil" onPress={iceAl} stil={stiller.aralik} />
+        {proMu && gecmis.length > 0 && (
+          <Buton baslik="Tüm Geçmişi Sil" tur="tehlike" onPress={hepsiniSil} stil={stiller.aralik} />
+        )}
       </View>
     </View>
   );
@@ -148,6 +207,15 @@ export default function GecmisEkrani() {
 const stiller = StyleSheet.create({
   govde: { flex: 1 },
   liste: { padding: 16 },
+  donemSegmenti: {
+    flexDirection: 'row',
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 3,
+    marginBottom: 12,
+  },
+  donemSekmesi: { flex: 1, borderRadius: 9, paddingVertical: 8, alignItems: 'center' },
+  donemMetni: { fontSize: 14, fontWeight: '800' },
   kilitBandi: { borderWidth: 2, borderRadius: 14, padding: 14, marginBottom: 12 },
   kilitSatiri: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   kilitBaslik: { fontSize: 15, fontWeight: '800', flex: 1 },

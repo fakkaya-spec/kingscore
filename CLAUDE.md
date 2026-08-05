@@ -11,6 +11,6 @@
 - Para kazanma (kullanıcıya görünen ad: **Premium**): iki ürün —
   `king_pro_lifetime` (non-consumable, 299,99 ₺) ve `king_premium_yillik`
   (otomatik yenilenen yıllık abonelik, 149,99 ₺); ikisi de `pro` entitlement'ını açar.
-  Ücretsizde toplam 4 deneme masası (UCRETSIZ_MASA_HAKKI).
+  Ücretsizde toplam 5 deneme masası (UCRETSIZ_MASA_HAKKI).
   Başlamış masa asla kilitlenmez; aylık/haftalık ürün ekleme.
 - Yasaklar: backend/auth/analytics/reklam yok; yıllık dışında abonelik yok; i18n katmanı yok.
