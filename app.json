@@ -2,6 +2,12 @@
   "expo": {
     "name": "King Skor",
     "slug": "king-skor",
+    "owner": "fakkayas-team",
+    "extra": {
+      "eas": {
+        "projectId": "a0553a0c-8320-4ff0-bdc3-57d2f7139bcf"
+      }
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
