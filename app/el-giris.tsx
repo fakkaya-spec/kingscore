@@ -113,10 +113,14 @@ export default function ElGirisEkrani() {
       setKutlama({ tur: 'rifki', ad: yiyen?.ad ?? '', puan: `${el.puanlar[yiyenId ?? ''] ?? 0}` });
       return;
     }
-    const temizId = masa.oyuncular.find((o) => (adetler[o.id] ?? 0) === 0)?.id;
-    if (tur !== 'KOZ' && temizId) {
-      const temiz = masa.oyuncular.find((o) => o.id === temizId);
-      setKutlama({ tur: 'temiz', ad: `${temiz?.ad} temiz atlattı!`, puan: '0' });
+    // Cezadan sıfırla çıkan HERKES kutlanır (iki kişi temizse ikisi de yazılır)
+    const temizler = masa.oyuncular.filter((o) => (adetler[o.id] ?? 0) === 0);
+    if (tur !== 'KOZ' && temizler.length > 0) {
+      setKutlama({
+        tur: 'temiz',
+        ad: `${temizler.map((o) => o.ad).join(' & ')} temiz atlattı!`,
+        puan: '0',
+      });
       return;
     }
     router.back();

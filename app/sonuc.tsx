@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   FadeInDown,
@@ -35,6 +35,7 @@ import { goruntuyuPaylas } from '@/servisler/paylas';
 import { sesCal } from '@/servisler/ses';
 import { kimlikUret } from '@/store/depo';
 import { useMasaStore, yeniMasaHakkiVarMi } from '@/store/masaStore';
+import { useOyuncuHavuzuStore } from '@/store/oyuncuHavuzuStore';
 import { usePro } from '@/store/proStore';
 import { useAyarStore } from '@/store/ayarStore';
 import { useRenkler } from '@/tema/renkler';
@@ -81,12 +82,33 @@ function SahneIkonu({
   );
 }
 
+// Kazananın tacı: nabız gibi büyüyüp küçülür ve hafifçe sallanır.
+// (rotateY dönüşü kenardan bakınca tacı görünmez kılıp yanıp sönme etkisi
+// yaratıyordu; o yüzden kullanılmıyor.)
 function DonenTac({ renk }: { renk: string }) {
+  const olcek = useSharedValue(1);
   const donus = useSharedValue(0);
   useEffect(() => {
-    donus.value = withRepeat(withTiming(360, { duration: 2400, easing: Easing.linear }), -1);
-  }, [donus]);
-  const stil = useAnimatedStyle(() => ({ transform: [{ rotateY: `${donus.value}deg` }] }));
+    olcek.value = withRepeat(
+      withSequence(
+        withTiming(1.22, { duration: 550, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: 550, easing: Easing.inOut(Easing.quad) }),
+      ),
+      -1,
+      true,
+    );
+    donus.value = withRepeat(
+      withSequence(
+        withTiming(-10, { duration: 450, easing: Easing.inOut(Easing.sin) }),
+        withTiming(10, { duration: 450, easing: Easing.inOut(Easing.sin) }),
+      ),
+      -1,
+      true,
+    );
+  }, [olcek, donus]);
+  const stil = useAnimatedStyle(() => ({
+    transform: [{ scale: olcek.value }, { rotate: `${donus.value}deg` }],
+  }));
   return (
     <Animated.View style={stil}>
       <Crown color={renk} size={24} strokeWidth={2.25} />
@@ -153,6 +175,29 @@ export default function SonucEkrani() {
     router.replace('/');
   };
 
+  // Rövanşta oturma sırası değişebilmeli: aynı sıra tek dokunuş,
+  // farklı sıra için oyuncular havuzdan yeniden seçilir.
+  const rovansSor = () => {
+    Alert.alert('Rövanş', 'Oturma sırası ne olsun?', [
+      { text: 'Aynı sırayla başla', onPress: () => kapatVeGit('rovans') },
+      {
+        text: 'Sırayı değiştir',
+        onPress: () => {
+          const { havuz, havuzaEkle } = useOyuncuHavuzuStore.getState();
+          for (const o of masa.oyuncular) {
+            const varMi = havuz.some(
+              (h) => h.ad.toLocaleLowerCase('tr') === o.ad.toLocaleLowerCase('tr'),
+            );
+            if (!varMi) havuzaEkle(o.ad, o.emoji, o.foto);
+          }
+          masayiKapat();
+          router.replace('/oyuncular');
+        },
+      },
+      { text: 'Vazgeç', style: 'cancel' },
+    ]);
+  };
+
   return (
     <View style={[stiller.govde, { backgroundColor: r.zemin }]}>
       <ScrollView contentContainerStyle={stiller.icerik}>
@@ -195,7 +240,7 @@ export default function SonucEkrani() {
                   key={satir.oyuncu.id}
                   entering={
                     animasyonlarAcik
-                      ? FadeInDown.delay(200 + i * 120).springify().damping(14)
+                      ? FadeInDown.delay(60 + i * 55).springify().damping(16)
                       : undefined
                   }
                   style={stiller.siralamaSatiri}
@@ -285,7 +330,7 @@ export default function SonucEkrani() {
           )}
         </View>
 
-        <Buton baslik="Rövanş" buyuk onPress={() => kapatVeGit('rovans')} stil={stiller.aralik} />
+        <Buton baslik="Rövanş" buyuk onPress={rovansSor} stil={stiller.aralik} />
         <Buton
           baslik="Skoru Paylaş"
           tur="ikincil"
@@ -327,8 +372,13 @@ const stiller = StyleSheet.create({
   kingRozetleri: { flexDirection: 'row', gap: 2 },
   siraNo: { fontSize: 18, fontWeight: '800', width: 26, fontVariant: ['tabular-nums'] },
   siraAdSatiri: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 7 },
-  siraAd: { fontSize: 19, fontWeight: '800', flexShrink: 1 },
-  siraPuan: { fontSize: 24, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  siraAd: { fontSize: 21, fontWeight: '800', flexShrink: 1 },
+  siraPuan: {
+    fontSize: 28,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+    flexShrink: 0, // puan hiçbir koşulda kırpılmasın — yaşı ne olursa olsun herkes okusun
+  },
   istKutusu: {
     borderWidth: 1,
     borderRadius: 14,
@@ -337,8 +387,8 @@ const stiller = StyleSheet.create({
     gap: 6,
   },
   istSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  istGlif: { fontSize: 14, fontWeight: '900', width: 16, textAlign: 'center' },
-  ist: { fontSize: 14, fontWeight: '600', flex: 1 },
+  istGlif: { fontSize: 15, fontWeight: '900', width: 17, textAlign: 'center' },
+  ist: { fontSize: 15, fontWeight: '600', flex: 1, lineHeight: 21 },
   tabloAlani: { height: 320, marginTop: 12 },
   filigran: { textAlign: 'center', marginTop: 8, fontSize: 12, fontStyle: 'italic' },
   aralik: { marginTop: 10 },
