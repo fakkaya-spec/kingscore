@@ -138,7 +138,7 @@ export default function GecmisEkrani() {
         }}
       />
       <View style={stiller.altAlan}>
-        <Buton baslik="Yedeği Dışa Aktar (JSON)" tur="ikincil" onPress={() => disaAktar()} />
+        <Buton baslik="Yedeği Dışa Aktar" tur="ikincil" onPress={() => disaAktar()} />
         <Buton baslik="Yedekten İçe Aktar" tur="ikincil" onPress={iceAl} stil={stiller.aralik} />
       </View>
     </View>

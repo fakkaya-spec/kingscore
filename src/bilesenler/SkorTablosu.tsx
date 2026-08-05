@@ -21,7 +21,9 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
     <View style={[stiller.cerceve, { borderColor: r.altin, backgroundColor: r.zeminKoyu }]}>
       {/* Başlık satırı: oyuncular */}
       <View style={[stiller.satir, { borderBottomColor: r.altin, borderBottomWidth: 2 }]}>
-        <View style={stiller.elSutunu} />
+        <View style={stiller.elSutunu}>
+          <Text style={[stiller.elBaslik, { color: r.soluk }]}>EL</Text>
+        </View>
         {masa.oyuncular.map((o) => (
           <View key={o.id} style={stiller.hucre}>
             <Text style={[stiller.oyuncuAdi, { color: r.altin }]} numberOfLines={1}>
@@ -120,6 +122,7 @@ const stiller = StyleSheet.create({
     paddingHorizontal: 6,
   },
   elSutunu: { width: 92 },
+  elBaslik: { fontSize: 12, fontWeight: '900', letterSpacing: 1 },
   hucre: { flex: 1, alignItems: 'center' },
   puanHucresi: { flexDirection: 'row', justifyContent: 'center', gap: 3 },
   oyuncuAdi: { fontSize: 14, fontWeight: '800' },

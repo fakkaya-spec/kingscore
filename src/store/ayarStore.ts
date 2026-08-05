@@ -12,7 +12,7 @@ export type MasaGorunumu = 'genel' | 'detayli';
 interface AyarDurumu {
   sesler: boolean;
   animasyonlar: boolean;
-  kingdeBiter: boolean; // King yapılınca oyun biter (varsayılan kapalı)
+  kingdeBiter: boolean; // King yapılınca oyun biter (varsayılan açık)
   tema: Tema;
   masaGorunumu: MasaGorunumu; // masa ekranındaki Genel/Detaylı sekmesi
   puanTablosu: PuanTablosu; // yeni masalara kopyalanacak taslak
@@ -31,7 +31,7 @@ export const useAyarStore = create<AyarDurumu>()(
     (set) => ({
       sesler: true,
       animasyonlar: true,
-      kingdeBiter: false,
+      kingdeBiter: true,
       tema: 'cuha',
       masaGorunumu: 'detayli',
       puanTablosu: { ...VARSAYILAN_PUAN_TABLOSU },

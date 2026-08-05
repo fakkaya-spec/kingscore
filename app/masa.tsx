@@ -67,20 +67,31 @@ function GenelGorunum({ masa }: { masa: Masa }) {
   );
 }
 
-/** Tüm masanın durumu tek satırda: her oyunun kaç kez daha oynanabileceği. */
+/** Tüm masanın durumu: her oyunun kaç kez daha oynanabileceği, rozetler halinde. */
 function KalanOyunlar({ masa }: { masa: Masa }) {
   const r = useRenkler();
   const ozet = kalanOyunOzeti(masa);
   return (
     <View style={stiller.kalanOyunSatiri}>
-      {ozet.map((satir, i) => (
-        <Text
-          key={satir.tur}
-          style={[stiller.kalanOyunMetni, { color: satir.kalan === 0 ? r.pasif : r.soluk }]}
-        >
-          {OYUN_ADI[satir.tur]} ({satir.kalan}){i < ozet.length - 1 ? ' · ' : ''}
-        </Text>
-      ))}
+      {ozet.map((satir) => {
+        const bitti = satir.kalan === 0;
+        return (
+          <View
+            key={satir.tur}
+            style={[
+              stiller.kalanOyunRozeti,
+              { borderColor: bitti ? r.cizgi : r.altin, opacity: bitti ? 0.45 : 1 },
+            ]}
+          >
+            <Text style={[stiller.kalanOyunMetni, { color: bitti ? r.pasif : r.metin }]}>
+              {OYUN_ADI[satir.tur]}
+            </Text>
+            <Text style={[stiller.kalanOyunSayi, { color: bitti ? r.pasif : r.altin }]}>
+              {satir.kalan}
+            </Text>
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -204,6 +215,15 @@ export default function MasaEkrani() {
         )}
       </View>
 
+      {/* Yanlış girilen el nasıl düzeltilir — görünüme göre yönlendirme */}
+      {masa.eller.length > 0 && (
+        <Text style={[stiller.duzeltmeIpucu, { color: r.soluk }]}>
+          {gorunum === 'genel'
+            ? 'Yanlış girilen bir eli düzeltmek için Detaylı görünüme geç, satıra uzun bas.'
+            : 'Bir eli düzeltmek veya silmek için satırına uzun bas.'}
+        </Text>
+      )}
+
       <KalanOyunlar masa={masa} />
 
       {/* Sıra bandı: oyuncu değişince yumuşakça yenilenir */}
@@ -266,10 +286,20 @@ const stiller = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    gap: 6,
     marginTop: 8,
-    paddingHorizontal: 2,
   },
-  kalanOyunMetni: { fontSize: 12, fontWeight: '600', lineHeight: 18 },
+  kalanOyunRozeti: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  kalanOyunMetni: { fontSize: 14, fontWeight: '700' },
+  kalanOyunSayi: { fontSize: 16, fontWeight: '900', fontVariant: ['tabular-nums'] },
   siraBandi: {
     borderRadius: 14,
     paddingVertical: 10,
@@ -278,6 +308,7 @@ const stiller = StyleSheet.create({
   },
   siraMetni: { fontSize: 22, fontWeight: '900', color: '#1A1A1A', letterSpacing: 1 },
   siraAlt: { fontSize: 13, color: '#1A1A1A', opacity: 0.75, marginTop: 2 },
+  duzeltmeIpucu: { fontSize: 11, textAlign: 'center', marginTop: 6 },
   elGirButonu: { marginTop: 10 },
   geriAlTusu: { minWidth: 48, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
 });

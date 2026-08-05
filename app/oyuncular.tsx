@@ -390,15 +390,16 @@ export default function OyuncularEkrani() {
 
       <Buton baslik="Arkadaşını Davet Et" tur="ikincil" onPress={() => davetPaylas()} />
 
-      {/* Uzun basma menüsündeki simgelerin ekran okuyucuda karşılığı */}
-      <View style={stiller.altNot}>
-        <Pencil color={r.soluk} size={12} strokeWidth={2} />
-        <Text style={[stiller.altNotMetni, { color: r.soluk }]}>
-          Karta uzun bas: düzenle
-        </Text>
-        <Trash2 color={r.soluk} size={12} strokeWidth={2} />
-        <Text style={[stiller.altNotMetni, { color: r.soluk }]}>sil</Text>
-      </View>
+      {/* İpucu yalnız havuz kartları görünürken anlamlı */}
+      {havuzVar && (
+        <View style={stiller.altNot}>
+          <Pencil color={r.soluk} size={12} strokeWidth={2} />
+          <Text style={[stiller.altNotMetni, { color: r.soluk }]}>
+            Bir oyuncunun adını değiştirmek ya da onu havuzdan silmek için kartına uzun bas
+          </Text>
+          <Trash2 color={r.soluk} size={12} strokeWidth={2} />
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -478,5 +479,5 @@ const stiller = StyleSheet.create({
     gap: 6,
     marginTop: 4,
   },
-  altNotMetni: { fontSize: 12 },
+  altNotMetni: { fontSize: 12, flexShrink: 1, textAlign: 'center' },
 });

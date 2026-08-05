@@ -99,7 +99,7 @@ assets/sesler/           # sentezlenmiş telifsiz WAV efektleri
 - **Altın kural:** oyun sonunda 4 oyuncunun toplamı **0** olmalıdır
   (12 ceza eli = −5200, 8 koz eli = +5200). Motor her girişte doğrular;
   toplam tutmayan el kaydedilemez, uyuşmazlıkta kırmızı uyarı gösterilir.
-- Koz elinde 11+ el alan **King** yapar (👑). "King'de oyun biter" ayarı varsayılan kapalıdır.
+- Koz elinde 11+ el alan **King** yapar. "King'de oyun biter" ayarı varsayılan açıktır.
 - Puan tablosu **Ayarlar → Puan Tablosu**'ndan düzenlenebilir; masa kurulurken
   o anki tablo masaya kopyalanıp kilitlenir.
 

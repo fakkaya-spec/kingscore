@@ -45,7 +45,7 @@ export default function AyarlarEkrani() {
       {satir('Animasyonlar', 'Konfeti, taç ve mikro animasyonlar', ayarlar.animasyonlar, ayarlar.animasyonlarAc)}
       {satir(
         "King'de oyun biter",
-        'Bir oyuncu King yapınca masa erken biter (varsayılan kapalı)',
+        'Bir oyuncu King yapınca masa erken biter',
         ayarlar.kingdeBiter,
         ayarlar.kingdeBiterAc,
       )}
@@ -99,7 +99,7 @@ export default function AyarlarEkrani() {
       <Buton baslik="King Skor Pro" onPress={() => router.push('/paywall')} stil={stiller.aralik} />
 
       <Text style={[stiller.bolum, { color: r.altin }]}>Yedekleme</Text>
-      <Buton baslik="Masaları Dışa Aktar (JSON)" tur="ikincil" onPress={() => disaAktar()} stil={stiller.aralik} />
+      <Buton baslik="Masaları Dışa Aktar" tur="ikincil" onPress={() => disaAktar()} stil={stiller.aralik} />
       <Buton baslik="Yedekten İçe Aktar" tur="ikincil" onPress={iceAl} stil={stiller.aralik} />
 
       <Text style={[stiller.bolum, { color: r.altin }]}>Hakkında</Text>

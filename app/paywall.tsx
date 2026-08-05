@@ -126,6 +126,10 @@ export default function PaywallEkrani() {
         pasif={islemde}
         stil={stiller.aralik}
       />
+      <Text style={[stiller.geriYukleNotu, { color: r.soluk }]}>
+        Pro&apos;yu daha önce satın aldıysan (ör. telefon değiştirdin veya uygulamayı sildin)
+        bu buton satın alımını mağazadan bulup Pro&apos;yu ücretsiz yeniden açar.
+      </Text>
 
       <View style={stiller.baglantilar}>
         <Text onPress={() => router.push('/gizlilik')} style={[stiller.baglanti, { color: r.altin }]}>
@@ -160,6 +164,7 @@ const stiller = StyleSheet.create({
   ozellikSatiri: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   ozellik: { fontSize: 16, fontWeight: '600' },
   magazaUyari: { textAlign: 'center', marginTop: 14, fontSize: 13 },
+  geriYukleNotu: { textAlign: 'center', marginTop: 8, fontSize: 12, lineHeight: 17 },
   aralik: { marginTop: 12 },
   baglantilar: { flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 14 },
   baglanti: { fontSize: 13, fontWeight: '700', textDecorationLine: 'underline', padding: 8 },
