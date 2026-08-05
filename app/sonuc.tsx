@@ -17,7 +17,6 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
-  FadeInDown,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -154,7 +153,7 @@ export default function SonucEkrani() {
     const oyuncular = masa.oyuncular;
 
     if (hedef === 'rovans') {
-      // Rövanş da yeni bir masadır: günlük ücretsiz sınıra tabidir
+      // Rövanş da yeni bir masadır: ücretsiz deneme sınırına tabidir
       if (!yeniMasaHakkiVarMi(proMu)) {
         router.push('/paywall');
         return;
@@ -232,19 +231,13 @@ export default function SonucEkrani() {
           style={[stiller.paylasilan, { backgroundColor: r.zemin }]}
         >
           <View style={[stiller.siralamaKutusu, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}>
-            {sonuc.siralama.map((satir, i) => {
+            {/* Bu satırlar paylaşım görüntüsüne girer; beliriş animasyonu
+                cihazda takılıp satırları görünmez bırakabildiği için YOK. */}
+            {sonuc.siralama.map((satir) => {
               const kazanan = satir.sira === 1 && satir.puan > 0;
               const sonuncu = satir.oyuncu.id === sonSira.oyuncu.id && satir.puan < 0;
               return (
-                <Animated.View
-                  key={satir.oyuncu.id}
-                  entering={
-                    animasyonlarAcik
-                      ? FadeInDown.delay(60 + i * 55).springify().damping(16)
-                      : undefined
-                  }
-                  style={stiller.siralamaSatiri}
-                >
+                <View key={satir.oyuncu.id} style={stiller.siralamaSatiri}>
                   <View style={stiller.rozetAlani}>
                     {kazanan &&
                       (animasyonlarAcik ? (
@@ -276,7 +269,7 @@ export default function SonucEkrani() {
                   >
                     {satir.puan > 0 ? `+${satir.puan}` : satir.puan}
                   </Text>
-                </Animated.View>
+                </View>
               );
             })}
           </View>

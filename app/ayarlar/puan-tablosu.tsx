@@ -40,10 +40,10 @@ export default function PuanTablosuEkrani() {
           <View style={stiller.kilitSatiri}>
             <Lock color={r.altin} size={16} strokeWidth={2.25} />
             <Text style={[stiller.kilitMetin, { color: r.altin }]}>
-              Puan tablosunu özelleştirme Pro ile açılır
+              Puan tablosunu özelleştirme Premium ile açılır
             </Text>
           </View>
-          <Buton baslik="Pro'yu İncele" onPress={() => router.push('/paywall')} />
+          <Buton baslik="Premium'u İncele" onPress={() => router.push('/paywall')} />
         </View>
       )}
       <Text style={[stiller.aciklama, { color: r.soluk }]}>

@@ -56,7 +56,7 @@ export default function OyuncularEkrani() {
 
   const baslat = (oyuncular: [Oyuncu, Oyuncu, Oyuncu, Oyuncu], ad?: string) => {
     if (!yeniMasaHakkiVarMi(proMu)) {
-      // Günlük ücretsiz hak dolmuş; nazikçe paywall'a yönlendir
+      // Ücretsiz deneme hakkı dolmuş; nazikçe paywall'a yönlendir
       router.push('/paywall');
       return;
     }

@@ -6,7 +6,7 @@ import { VARSAYILAN_PUAN_TABLOSU } from '@/core/sabitler';
 import type { PuanTablosu } from '@/core/tipler';
 import { mmkvDepo } from './depo';
 
-export type Tema = 'cuha' | 'ahsap' | 'gece';
+export type Tema = 'cuha' | 'ahsap' | 'gece' | 'yaz';
 export type MasaGorunumu = 'genel' | 'detayli';
 
 interface AyarDurumu {

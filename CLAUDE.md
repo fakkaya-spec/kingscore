@@ -8,6 +8,6 @@
 - Altın kural: oyun sonunda 4 oyuncunun puan toplamı 0 olmalıdır — motoru değiştirirken
   `npm test` geçmeden bırakma.
 - Kontroller: `npm test`, `npm run typecheck`, `npm run lint`.
-- Para kazanma: tek ürün `king_pro_lifetime` (non-consumable); ücretsizde günde 1 masa.
+- Para kazanma: tek ürün `king_pro_lifetime` (non-consumable); ücretsizde toplam 4 deneme masası (UCRETSIZ_MASA_HAKKI).
   Başlamış masa asla kilitlenmez; abonelik ürünü ekleme.
 - Yasaklar: backend/auth/analytics/reklam yok; abonelik yok; i18n katmanı yok.

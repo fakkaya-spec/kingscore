@@ -14,8 +14,8 @@ export default function KokYerlesim() {
 
   return (
     <>
-      {/* Tüm masa temaları koyudur */}
-      <StatusBar style="light" />
+      {/* Yazlık tema açık renklidir; durum çubuğu temaya uyar */}
+      <StatusBar style={r.acikMi ? 'dark' : 'light'} />
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: r.zeminKoyu },
@@ -33,7 +33,7 @@ export default function KokYerlesim() {
         <Stack.Screen name="gecmis" options={{ title: 'Geçmiş Masalar' }} />
         <Stack.Screen name="gecmis-detay" options={{ title: 'Masa Detayı' }} />
         <Stack.Screen name="kurallar" options={{ title: 'Kurallar & Puan Tablosu' }} />
-        <Stack.Screen name="paywall" options={{ title: 'King Skor Pro', presentation: 'modal' }} />
+        <Stack.Screen name="paywall" options={{ title: 'King Skor Premium', presentation: 'modal' }} />
         <Stack.Screen name="gizlilik" options={{ title: 'Gizlilik Politikası' }} />
         <Stack.Screen name="ayarlar/index" options={{ title: 'Ayarlar' }} />
         <Stack.Screen name="ayarlar/puan-tablosu" options={{ title: 'Puan Tablosu' }} />

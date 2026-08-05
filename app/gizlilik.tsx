@@ -15,7 +15,7 @@ export default function GizlilikEkrani() {
         hiçbir sunucuya gönderilmez.{'\n\n'}
         • Uygulama internet bağlantısı olmadan da tam olarak çalışır.{'\n\n'}
         • Uygulamada reklam, analitik veya izleme aracı yoktur.{'\n\n'}
-        • Tek istisna satın alma işlemleridir: King Skor Pro satın aldığınızda işlem,
+        • Tek istisna satın alma işlemleridir: King Skor Premium satın aldığınızda işlem,
         App Store / Google Play ve satın alma altyapımız (RevenueCat) üzerinden doğrulanır.
         Bu doğrulama sırasında yalnızca mağazanın sağladığı anonim işlem bilgisi kullanılır;
         adınız, e-postanız veya rehberiniz gibi veriler bize ulaşmaz.{'\n\n'}

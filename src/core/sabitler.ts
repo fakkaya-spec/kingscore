@@ -12,6 +12,12 @@ export const VARSAYILAN_PUAN_TABLOSU: PuanTablosu = {
 };
 
 export const TOPLAM_EL_SAYISI = 20;
+
+/**
+ * Ücretsiz deneme: toplam bu kadar masa kurulabilir, sonrası Premium.
+ * (Günlük yenilenmez; başlamış masa hiçbir koşulda kilitlenmez.)
+ */
+export const UCRETSIZ_MASA_HAKKI = 4;
 export const KOZ_HAKKI = 2; // oyuncu başına
 export const CEZA_HAKKI = 3; // oyuncu başına
 export const CEZA_MASA_LIMITI = 2; // her ceza türü masada en fazla 2 kez

@@ -3,8 +3,7 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { masaBaslatabilirMi, yeniSinirGunu } from '@/core/gunlukSinir';
-import { TOPLAM_EL_SAYISI } from '@/core/sabitler';
+import { TOPLAM_EL_SAYISI, UCRETSIZ_MASA_HAKKI } from '@/core/sabitler';
 import { kingMi, puanHesapla } from '@/core/skor';
 import type { El, Koz, Masa, Oyuncu, OyunTuru } from '@/core/tipler';
 import { useAyarStore } from './ayarStore';
@@ -21,7 +20,7 @@ interface MasaDurumu {
   aktifMasa: Masa | null;
   gecmis: Masa[];
   sonOyuncular: Oyuncu[] | null; // "Aynı ekiple başla" için
-  sonMasaGunu: string | null; // günlük ücretsiz sınır için ("2026-08-03")
+  kurulanMasaSayisi: number; // ücretsiz deneme sınırı için ömür boyu sayaç
 
   masaKur: (oyuncular: [Oyuncu, Oyuncu, Oyuncu, Oyuncu], ad?: string) => void;
   elKaydet: (girdi: ElGirdisi) => El;
@@ -40,7 +39,7 @@ export const useMasaStore = create<MasaDurumu>()(
       aktifMasa: null,
       gecmis: [],
       sonOyuncular: null,
-      sonMasaGunu: null,
+      kurulanMasaSayisi: 0,
 
       masaKur: (oyuncular, ad) => {
         // O anki puan tablosu masaya kopyalanır ve kilitlenir
@@ -53,13 +52,11 @@ export const useMasaStore = create<MasaDurumu>()(
           eller: [],
           baslangic: Date.now(),
         };
-        set({
+        set((d) => ({
           aktifMasa: masa,
           sonOyuncular: oyuncular,
-          // Günlük ücretsiz sınır takibi: saat geri alındıysa en son görülen günü
-          // korur, aşırı gelecekteki bozuk kaydı gerçek tarihe göre sıfırlar
-          sonMasaGunu: yeniSinirGunu(get().sonMasaGunu, Date.now()),
-        });
+          kurulanMasaSayisi: d.kurulanMasaSayisi + 1,
+        }));
       },
 
       elKaydet: (girdi) => {
@@ -151,9 +148,10 @@ export const useMasaStore = create<MasaDurumu>()(
 
 /**
  * Yeni masa başlatma hakkı (olay anında çağrılır, render içinde değil).
- * Pro: sınırsız. Ücretsiz: günde 1 masa; başlamış masa asla kilitlenmez.
+ * Premium: sınırsız. Ücretsiz: toplam UCRETSIZ_MASA_HAKKI deneme masası;
+ * başlamış masa asla kilitlenmez.
  */
 export function yeniMasaHakkiVarMi(proMu: boolean): boolean {
   if (proMu) return true;
-  return masaBaslatabilirMi(useMasaStore.getState().sonMasaGunu, Date.now());
+  return useMasaStore.getState().kurulanMasaSayisi < UCRETSIZ_MASA_HAKKI;
 }

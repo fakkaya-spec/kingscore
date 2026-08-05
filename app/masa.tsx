@@ -72,7 +72,7 @@ function GenelGorunum({ masa }: { masa: Masa }) {
 }
 
 /** Tüm masanın durumu: her oyunun kaç kez daha oynanabileceği, rozetler halinde. */
-function KalanOyunlar({ masa }: { masa: Masa }) {
+function KalanOyunlar({ masa, buyuk }: { masa: Masa; buyuk?: boolean }) {
   const r = useRenkler();
   const ozet = kalanOyunOzeti(masa);
   return (
@@ -84,13 +84,26 @@ function KalanOyunlar({ masa }: { masa: Masa }) {
             key={satir.tur}
             style={[
               stiller.kalanOyunRozeti,
+              buyuk && stiller.kalanOyunRozetiBuyuk,
               { borderColor: bitti ? r.cizgi : r.altin, opacity: bitti ? 0.45 : 1 },
             ]}
           >
-            <Text style={[stiller.kalanOyunMetni, { color: bitti ? r.pasif : r.metin }]}>
+            <Text
+              style={[
+                stiller.kalanOyunMetni,
+                buyuk && stiller.kalanOyunMetniBuyuk,
+                { color: bitti ? r.pasif : r.metin },
+              ]}
+            >
               {OYUN_ADI[satir.tur]}
             </Text>
-            <Text style={[stiller.kalanOyunSayi, { color: bitti ? r.pasif : r.altin }]}>
+            <Text
+              style={[
+                stiller.kalanOyunSayi,
+                buyuk && stiller.kalanOyunSayiBuyuk,
+                { color: bitti ? r.pasif : r.altin },
+              ]}
+            >
               {satir.kalan}
             </Text>
           </View>
@@ -211,24 +224,31 @@ export default function MasaEkrani() {
         })}
       </View>
 
-      <View style={stiller.tabloAlani}>
-        {gorunum === 'genel' ? (
+      {gorunum === 'genel' ? (
+        // Genel: kutu içeriğe göre daralır, kalan oyun rozetleri boşalan alanda büyür
+        <>
           <GenelGorunum masa={masa} />
-        ) : (
-          <SkorTablosu masa={masa} onSatirUzunBas={satirMenusu} />
-        )}
-      </View>
-
-      {/* Yanlış girilen el nasıl düzeltilir — görünüme göre yönlendirme */}
-      {masa.eller.length > 0 && (
-        <Text style={[stiller.duzeltmeIpucu, { color: r.soluk }]}>
-          {gorunum === 'genel'
-            ? 'Yanlış girilen bir eli düzeltmek için Detaylı görünüme geç, satıra uzun bas.'
-            : 'Bir eli düzeltmek veya silmek için satırına uzun bas.'}
-        </Text>
+          <KalanOyunlar masa={masa} buyuk />
+          {masa.eller.length > 0 && (
+            <Text style={[stiller.duzeltmeIpucu, { color: r.soluk }]}>
+              Yanlış girilen bir eli düzeltmek için Detaylı görünüme geç, satıra uzun bas.
+            </Text>
+          )}
+          <View style={stiller.esnekBosluk} />
+        </>
+      ) : (
+        <>
+          <View style={stiller.tabloAlani}>
+            <SkorTablosu masa={masa} onSatirUzunBas={satirMenusu} />
+          </View>
+          {masa.eller.length > 0 && (
+            <Text style={[stiller.duzeltmeIpucu, { color: r.soluk }]}>
+              Bir eli düzeltmek veya silmek için satırına uzun bas.
+            </Text>
+          )}
+          <KalanOyunlar masa={masa} />
+        </>
       )}
-
-      <KalanOyunlar masa={masa} />
 
       {/* Sıra bandı: oyuncu değişince yumuşakça yenilenir */}
       {sirali && (
@@ -274,7 +294,8 @@ const stiller = StyleSheet.create({
   },
   sekmeMetni: { fontSize: 15, fontWeight: '800', letterSpacing: 0.5 },
   tabloAlani: { flex: 1 },
-  genelCerceve: { flex: 1, borderWidth: 2, borderRadius: 16 },
+  esnekBosluk: { flex: 1 },
+  genelCerceve: { flexGrow: 0, borderWidth: 2, borderRadius: 16 },
   genelIcerik: { padding: 10, gap: 8 },
   genelSatir: {
     flexDirection: 'row',
@@ -310,8 +331,11 @@ const stiller = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
+  kalanOyunRozetiBuyuk: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, gap: 7 },
   kalanOyunMetni: { fontSize: 14, fontWeight: '700' },
+  kalanOyunMetniBuyuk: { fontSize: 18 },
   kalanOyunSayi: { fontSize: 16, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  kalanOyunSayiBuyuk: { fontSize: 21 },
   siraBandi: {
     borderRadius: 14,
     paddingVertical: 10,

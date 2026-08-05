@@ -70,5 +70,7 @@ const stiller = StyleSheet.create({
   },
   buyukMetin: {
     fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
 });

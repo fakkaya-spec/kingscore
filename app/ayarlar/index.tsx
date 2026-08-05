@@ -10,7 +10,7 @@ import { useAyarStore, type Tema } from '@/store/ayarStore';
 import { usePro } from '@/store/proStore';
 import { TEMALAR, TEMA_ADLARI, useRenkler } from '@/tema/renkler';
 
-const TEMA_SIRASI: Tema[] = ['cuha', 'ahsap', 'gece'];
+const TEMA_SIRASI: Tema[] = ['cuha', 'ahsap', 'gece', 'yaz'];
 
 export default function AyarlarEkrani() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function AyarlarEkrani() {
         ayarlar.kingdeBiterAc,
       )}
 
-      {/* Masa teması: yeşil çuha ücretsiz; ahşap ve gece mavisi Pro */}
+      {/* Masa teması: yeşil çuha ücretsiz; diğerleri Premium */}
       <Text style={[stiller.bolum, { color: r.altin }]}>Masa Teması</Text>
       <View style={stiller.temalar}>
         {TEMA_SIRASI.map((tema) => {
@@ -91,12 +91,12 @@ export default function AyarlarEkrani() {
       </View>
 
       <Buton
-        baslik={proMu ? 'Puan Tablosunu Özelleştir' : 'Puan Tablosunu Özelleştir (Pro)'}
+        baslik={proMu ? 'Puan Tablosunu Özelleştir' : 'Puan Tablosunu Özelleştir (Premium)'}
         tur="ikincil"
         onPress={() => router.push('/ayarlar/puan-tablosu')}
         stil={stiller.aralik}
       />
-      <Buton baslik="King Skor Pro" onPress={() => router.push('/paywall')} stil={stiller.aralik} />
+      <Buton baslik="King Skor Premium" onPress={() => router.push('/paywall')} stil={stiller.aralik} />
 
       <Text style={[stiller.bolum, { color: r.altin }]}>Yedekleme</Text>
       <Buton baslik="Masaları Dışa Aktar" tur="ikincil" onPress={() => disaAktar()} stil={stiller.aralik} />

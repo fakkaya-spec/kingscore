@@ -12,11 +12,11 @@ import { usePro } from '@/store/proStore';
 import { useRenkler } from '@/tema/renkler';
 
 const OZELLIKLER = [
-  'Sınırsız masa (günlük limit kalkar)',
+  'Sınırsız masa (deneme sınırı kalkar)',
   'Geçmiş masalar ve oyuncu istatistikleri',
   'Puan tablosunu özelleştirme',
   'Filigransız skor paylaşımı',
-  'Ekstra masa temaları: ahşap & gece mavisi',
+  'Ekstra temalar: ahşap, gece mavisi, yazlık',
 ];
 
 export default function PaywallEkrani() {
@@ -41,7 +41,7 @@ export default function PaywallEkrani() {
     setIslemde(false);
     if (basarili) {
       basariTitret();
-      Alert.alert('Hoş geldin!', 'King Skor Pro aktif. İyi oyunlar!');
+      Alert.alert('Hoş geldin!', 'King Skor Premium aktif. İyi oyunlar!');
     }
   };
 
@@ -51,7 +51,7 @@ export default function PaywallEkrani() {
     setIslemde(false);
     Alert.alert(
       bulundu ? 'Geri yüklendi' : 'Satın alım bulunamadı',
-      bulundu ? 'King Skor Pro aktif.' : 'Bu hesapla yapılmış bir satın alım bulunamadı.',
+      bulundu ? 'King Skor Premium aktif.' : 'Bu hesapla yapılmış bir satın alım bulunamadı.',
     );
   };
 
@@ -71,7 +71,7 @@ export default function PaywallEkrani() {
       <View style={[stiller.merkez, { backgroundColor: r.zemin }]}>
         <Stack.Screen options={{ headerRight: () => kapatmaTusu }} />
         <Crown color={r.altin} size={72} strokeWidth={1.75} />
-        <Text style={[stiller.tesekkur, { color: r.metin }]}>King Skor Pro aktif. İyi oyunlar!</Text>
+        <Text style={[stiller.tesekkur, { color: r.metin }]}>King Skor Premium aktif. İyi oyunlar!</Text>
       </View>
     );
   }
@@ -80,7 +80,7 @@ export default function PaywallEkrani() {
     <ScrollView style={{ backgroundColor: r.zemin }} contentContainerStyle={stiller.icerik}>
       <Stack.Screen options={{ headerRight: () => kapatmaTusu }} />
 
-      <Text style={[stiller.baslik, { color: r.altin }]}>King Skor Pro</Text>
+      <Text style={[stiller.baslik, { color: r.altin }]}>King Skor Premium</Text>
 
       {/* Tek büyük kart: ömür boyu */}
       <Pressable
@@ -113,7 +113,7 @@ export default function PaywallEkrani() {
       )}
 
       <Buton
-        baslik={islemde ? 'İşleniyor…' : 'Pro’ya Geç'}
+        baslik={islemde ? 'İşleniyor…' : 'Premium’a Geç'}
         buyuk
         pasif={islemde || !paket}
         onPress={al}
@@ -127,8 +127,8 @@ export default function PaywallEkrani() {
         stil={stiller.aralik}
       />
       <Text style={[stiller.geriYukleNotu, { color: r.soluk }]}>
-        Pro&apos;yu daha önce satın aldıysan (ör. telefon değiştirdin veya uygulamayı sildin)
-        bu buton satın alımını mağazadan bulup Pro&apos;yu ücretsiz yeniden açar.
+        Premium&apos;u daha önce satın aldıysan (ör. telefon değiştirdin veya uygulamayı sildin)
+        bu buton satın alımını mağazadan bulup Premium&apos;u ücretsiz yeniden açar.
       </Text>
 
       <View style={stiller.baglantilar}>

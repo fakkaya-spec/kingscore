@@ -60,7 +60,7 @@ export default function AnaEkran() {
           accessibilityRole="button"
           onPress={() => {
             hafifTitret();
-            // Ücretsizde günde 1 masa; hakkı bitince paywall (masa ortasında asla kilit yok)
+            // Ücretsizde toplam 4 deneme masası; hakkı bitince paywall (masa ortasında asla kilit yok)
             router.push(yeniMasaHakkiVarMi(proMu) ? '/oyuncular' : '/paywall');
           }}
           style={({ pressed }) => [

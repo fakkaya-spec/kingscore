@@ -46,7 +46,7 @@ export default function GecmisEkrani() {
                 <View style={stiller.kilitSatiri}>
                   <Lock color={r.altin} size={16} strokeWidth={2.25} />
                   <Text style={[stiller.kilitBaslik, { color: r.altin }]}>
-                    Geçmiş masalar ve istatistikler Pro ile açılır
+                    Geçmiş masalar ve istatistikler Premium ile açılır
                   </Text>
                 </View>
                 <Text style={[stiller.kilitAlt, { color: r.soluk }]}>
@@ -130,7 +130,7 @@ export default function GecmisEkrani() {
                 </View>
               ) : (
                 <Text style={[stiller.kartAlt, stiller.kartAltSatiri, { color: r.soluk }]}>
-                  Detay için Pro gerekli
+                  Detay için Premium gerekli
                 </Text>
               )}
             </Pressable>

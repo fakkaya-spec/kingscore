@@ -191,7 +191,8 @@ export default function ElGirisEkrani() {
               ) : (
                 <Stepper
                   deger={adetler[o.id] ?? 0}
-                  enCok={hedef}
+                  // Masadaki toplam hedefi aşamaz: artı, kalan birim kadar çalışır
+                  enCok={(adetler[o.id] ?? 0) + Math.max(0, hedef - dogrulama.toplam)}
                   onDegis={(yeni) => setAdetler((eski) => ({ ...eski, [o.id]: yeni }))}
                 />
               )}

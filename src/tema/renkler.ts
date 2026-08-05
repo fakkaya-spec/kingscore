@@ -15,6 +15,7 @@ export interface Renkler {
   yesil: string; // artı puanlar
   cizgi: string;
   pasif: string;
+  acikMi: boolean; // açık temada durum çubuğu koyu yazılır
 }
 
 /**
@@ -34,6 +35,7 @@ export const CUHA: Renkler = {
   yesil: '#6FCF97',
   cizgi: '#164632',
   pasif: '#2F5A45',
+  acikMi: false,
 };
 
 /** Ahşap masa (Pro). */
@@ -49,6 +51,7 @@ export const AHSAP: Renkler = {
   yesil: '#8FCF97',
   cizgi: '#5A4330',
   pasif: '#6B5641',
+  acikMi: false,
 };
 
 /** Gece mavisi (Pro). */
@@ -64,18 +67,37 @@ export const GECE: Renkler = {
   yesil: '#6FCF97',
   cizgi: '#1E3560',
   pasif: '#3C5480',
+  acikMi: false,
+};
+
+/** Yazlık (Premium): açık, ferah; yaz akşamı bahçe masası. */
+export const YAZ: Renkler = {
+  zemin: '#F6F1E3',
+  zeminKoyu: '#FFFFFF',
+  kart: '#FFFFFF',
+  kartUstu: '#1F2A20',
+  metin: '#243528',
+  soluk: '#77836F',
+  altin: '#B8912A',
+  kirmizi: '#C1272D',
+  yesil: '#2E7D46',
+  cizgi: '#DFD6BD',
+  pasif: '#C9C2AD',
+  acikMi: true,
 };
 
 export const TEMALAR: Record<Tema, Renkler> = {
   cuha: CUHA,
   ahsap: AHSAP,
   gece: GECE,
+  yaz: YAZ,
 };
 
 export const TEMA_ADLARI: Record<Tema, string> = {
   cuha: 'Yeşil Çuha',
   ahsap: 'Ahşap',
   gece: 'Gece Mavisi',
+  yaz: 'Yazlık',
 };
 
 /** Seçili temanın renk paletini döner (varsayılan yeşil çuha). */

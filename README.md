@@ -6,7 +6,8 @@
 - **Reklam yok, analytics yok, izin istemez**
 - Sadece Türkçe, para birimi ₺
 - Tek ürün: **`king_pro_lifetime`** (non-consumable, 199 ₺) — **abonelik YOK**
-- Ücretsiz sınır: **günde 1 masa** (yerel gün başlangıcında sıfırlanır; masa ortasında asla kilit yok)
+  (kullanıcıya görünen ad: **King Skor Premium**)
+- Ücretsiz sınır: **toplam 4 deneme masası** (`UCRETSIZ_MASA_HAKKI`); masa ortasında asla kilit yok
 
 ## Teknoloji
 
@@ -35,7 +36,7 @@ npm install --legacy-peer-deps
 npm start            # Expo dev server
 
 # Kontroller
-npm test             # 58 jest testi (skor motoru)
+npm test             # 45 jest testi (skor motoru)
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
 ```
@@ -74,9 +75,8 @@ src/
     sabitler.ts          # varsayılan puanlar, hedef birimler, adlar
     skor.ts              # puanHesapla, elDogrula, kalanHaklar, toplamSkorlar,
                          # sonucBelirle, secilebilirOyunlar, genelIstatistikler
-    gunlukSinir.ts       # günde 1 masa sınırı + saat istismarı koruması
     kalanOyun.ts         # masada her oyunun kaç kez daha oynanabileceği
-    __tests__/           # skor + gunlukSinir + kalanOyun testleri (58 test)
+    __tests__/           # skor + kalanOyun testleri (45 test)
   store/                 # zustand + MMKV persist
     depo.ts              # MMKV örneği + StateStorage adaptörü
     masaStore.ts         # aktif masa, geçmiş, el CRUD, rövanş, günlük hak
@@ -107,16 +107,14 @@ assets/sesler/           # sentezlenmiş telifsiz WAV efektleri
 
 - **Tek ürün:** `king_pro_lifetime` — non-consumable (kalıcı satın alım), 199 ₺.
   Otomatik yenilenen abonelik YOK; yıllık/aylık ürün YOK.
-- **Ücretsiz sınır: günde 1 masa.** Ücretsiz kullanıcı her gün 1 masa başlatır ve
-  20 elin tamamını, sonuç ekranını ve tüm animasyonları görür — deneyim kırpılmaz.
-  Sınır cihazın yerel gün başlangıcında (00:00) sıfırlanır. Kaydedilen son masa günü
-  gelecekteyse (kullanıcı saati geri almışsa) sınır sıfırlanmaz; gerçek zaman o günü
-  geçince kendiliğinden açılır, kimse kalıcı kilitlenmez (`src/core/gunlukSinir.ts`,
-  testli). Başlamış masa **hiçbir koşulda** kilitlenmez.
-- **Pro ile açılanlar:** sınırsız masa, geçmiş masalar + oyuncu istatistikleri
+- **Ücretsiz sınır: toplam 4 deneme masası.** Kullanıcı uygulamanın tadına varsın
+  diye ilk 4 masayı (20 elin tamamı, sonuç ekranı, tüm animasyonlar) kısıtsız oynar;
+  5. masada paywall açılır. Sayaç `masaStore.kurulanMasaSayisi` ile tutulur, günlük
+  yenilenmez. Başlamış masa **hiçbir koşulda** kilitlenmez.
+- **Premium ile açılanlar:** sınırsız masa, geçmiş masalar + oyuncu istatistikleri
   (en çok rıfkı yiyen, en çok King yapan, ortalamalar), puan tablosu özelleştirme,
-  filigransız paylaşım, ekstra masa temaları (ahşap / gece mavisi). Ücretsiz sürümde
-  bu ekranlar görünür ama 🔒 rozetiyle kilitlidir.
+  filigransız paylaşım, ekstra masa temaları (ahşap / gece mavisi / yazlık).
+  Ücretsiz sürümde bu ekranlar görünür ama kilit rozetiyle kapalıdır.
 - Paywall'da karanlık desen yok: sahte indirim/geri sayım yok, sağ üstte X ile kapatılır.
 
 ## RevenueCat & mağaza kurulumu
