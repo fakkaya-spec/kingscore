@@ -1,5 +1,5 @@
-// Tasarım dili: koyu masa temaları. Varsayılan yeşil çuha; ahşap ve
-// gece mavisi Pro ile açılır.
+// Tasarım dili: varsayılan açık "yazlık" tema; yeşil çuha da ücretsizdir.
+// Ahşap ve gece mavisi Premium ile açılır.
 
 import { useAyarStore, type Tema } from '@/store/ayarStore';
 
@@ -19,7 +19,7 @@ export interface Renkler {
 }
 
 /**
- * Yeşil çuha (varsayılan, ücretsiz).
+ * Yeşil çuha (ücretsiz).
  * Zemin bilinçli olarak teal'den uzak, derin ve sıcak bir yeşildir;
  * altın baskın vurgu, kırmızı yalnızca rıfkı ve negatif puanlarda kullanılır.
  */
@@ -70,7 +70,7 @@ export const GECE: Renkler = {
   acikMi: false,
 };
 
-/** Yazlık (Premium): açık, ferah; yaz akşamı bahçe masası. */
+/** Yazlık (varsayılan, ücretsiz): açık, ferah; yaz akşamı bahçe masası. */
 export const YAZ: Renkler = {
   zemin: '#F6F1E3',
   zeminKoyu: '#FFFFFF',
@@ -100,8 +100,8 @@ export const TEMA_ADLARI: Record<Tema, string> = {
   yaz: 'Yazlık',
 };
 
-/** Seçili temanın renk paletini döner (varsayılan yeşil çuha). */
+/** Seçili temanın renk paletini döner (varsayılan yazlık). */
 export function useRenkler(): Renkler {
   const tema = useAyarStore((d) => d.tema);
-  return TEMALAR[tema] ?? CUHA;
+  return TEMALAR[tema] ?? YAZ;
 }

@@ -10,7 +10,9 @@ import { useAyarStore, type Tema } from '@/store/ayarStore';
 import { usePro } from '@/store/proStore';
 import { TEMALAR, TEMA_ADLARI, useRenkler } from '@/tema/renkler';
 
-const TEMA_SIRASI: Tema[] = ['cuha', 'ahsap', 'gece', 'yaz'];
+// Yazlık ve yeşil çuha ücretsiz; ahşap ve gece mavisi Premium
+const TEMA_SIRASI: Tema[] = ['yaz', 'cuha', 'ahsap', 'gece'];
+const UCRETSIZ_TEMALAR: Tema[] = ['yaz', 'cuha'];
 
 export default function AyarlarEkrani() {
   const router = useRouter();
@@ -50,11 +52,10 @@ export default function AyarlarEkrani() {
         ayarlar.kingdeBiterAc,
       )}
 
-      {/* Masa teması: yeşil çuha ücretsiz; diğerleri Premium */}
       <Text style={[stiller.bolum, { color: r.altin }]}>Masa Teması</Text>
       <View style={stiller.temalar}>
         {TEMA_SIRASI.map((tema) => {
-          const kilitli = tema !== 'cuha' && !proMu;
+          const kilitli = !UCRETSIZ_TEMALAR.includes(tema) && !proMu;
           const secili = ayarlar.tema === tema;
           const onizleme = TEMALAR[tema];
           return (

@@ -32,7 +32,7 @@ export const useAyarStore = create<AyarDurumu>()(
       sesler: true,
       animasyonlar: true,
       kingdeBiter: true,
-      tema: 'cuha',
+      tema: 'yaz',
       masaGorunumu: 'detayli',
       puanTablosu: { ...VARSAYILAN_PUAN_TABLOSU },
 

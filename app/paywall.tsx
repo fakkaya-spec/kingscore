@@ -21,7 +21,7 @@ const OZELLIKLER = [
   'Geçmiş masalar ve oyuncu istatistikleri',
   'Puan tablosunu özelleştirme',
   'Filigransız skor paylaşımı',
-  'Ekstra temalar: ahşap, gece mavisi, yazlık',
+  'Ekstra temalar: ahşap & gece mavisi',
 ];
 
 type PaketSecimi = 'yillik' | 'omurBoyu';

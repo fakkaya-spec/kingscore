@@ -88,7 +88,7 @@ src/
     satinalma.ts         # RevenueCat sarmalayıcısı
     ses.ts, titresim.ts, paylas.ts, yedekleme.ts
   bilesenler/            # Buton, Stepper, SkorTablosu, Konfeti, MikroAnimasyon
-  tema/renkler.ts        # koyu yeşil çuha + altın; açık tema (premium)
+  tema/renkler.ts        # varsayılan açık yazlık tema + yeşil çuha; ahşap/gece Premium
 assets/sesler/           # sentezlenmiş telifsiz WAV efektleri
 ```
 
@@ -118,7 +118,7 @@ assets/sesler/           # sentezlenmiş telifsiz WAV efektleri
   yenilenmez. Başlamış masa **hiçbir koşulda** kilitlenmez.
 - **Premium ile açılanlar:** sınırsız masa, geçmiş masalar + oyuncu istatistikleri
   (en çok rıfkı yiyen, en çok King yapan, ortalamalar), puan tablosu özelleştirme,
-  filigransız paylaşım, ekstra masa temaları (ahşap / gece mavisi / yazlık).
+  filigransız paylaşım, ekstra masa temaları (ahşap / gece mavisi).
   Ücretsiz sürümde bu ekranlar görünür ama kilit rozetiyle kapalıdır.
 - Paywall'da karanlık desen yok: sahte indirim/geri sayım yok, sağ üstte X ile kapatılır.
 
