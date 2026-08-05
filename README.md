@@ -5,8 +5,9 @@
 - **Sunucu yok** — tüm veri cihazda (MMKV), uçak modunda %100 çalışır
 - **Reklam yok, analytics yok, izin istemez**
 - Sadece Türkçe, para birimi ₺
-- Tek ürün: **`king_pro_lifetime`** (non-consumable, 199 ₺) — **abonelik YOK**
-  (kullanıcıya görünen ad: **King Skor Premium**)
+- İki ürün (kullanıcıya görünen ad: **King Skor Premium**):
+  **`king_pro_lifetime`** (non-consumable, 299,99 ₺) ve
+  **`king_premium_yillik`** (otomatik yenilenen yıllık abonelik, 149,99 ₺)
 - Ücretsiz sınır: **toplam 4 deneme masası** (`UCRETSIZ_MASA_HAKKI`); masa ortasında asla kilit yok
 
 ## Teknoloji
@@ -105,8 +106,12 @@ assets/sesler/           # sentezlenmiş telifsiz WAV efektleri
 
 ## Para kazanma modeli
 
-- **Tek ürün:** `king_pro_lifetime` — non-consumable (kalıcı satın alım), 199 ₺.
-  Otomatik yenilenen abonelik YOK; yıllık/aylık ürün YOK.
+- **İki ürün, tek entitlement (`pro`):**
+  - `king_pro_lifetime` — non-consumable (kalıcı satın alım), **299,99 ₺**.
+    Paywall'da "EN İYİ DEĞER" rozetiyle öne çıkar (yıllığın 2 katı = çapa).
+  - `king_premium_yillik` — otomatik yenilenen **yıllık** abonelik, **149,99 ₺**.
+  - Aylık/haftalık ürün YOK (skor defteri için abonelik baskısı algısı yaratır;
+    rakip analizi 2026-08).
 - **Ücretsiz sınır: toplam 4 deneme masası.** Kullanıcı uygulamanın tadına varsın
   diye ilk 4 masayı (20 elin tamamı, sonuç ekranı, tüm animasyonlar) kısıtsız oynar;
   5. masada paywall açılır. Sayaç `masaStore.kurulanMasaSayisi` ile tutulur, günlük
@@ -126,9 +131,12 @@ Kod tarafında yapılacak tek şey: `src/servisler/satinalma.ts` içindeki
 ### 1. App Store Connect
 
 1. **Uygulama İçi Satın Alımlar → Oluştur**: **`king_pro_lifetime`** —
-   tür **Non-Consumable**, fiyat **199 ₺** (Türkiye vitrini).
-   Abonelik grubu OLUŞTURMAYIN; başka ürün eklemeyin.
-2. Türkçe görünen ad ("King Skor Pro — Ömür Boyu") ve açıklama girin.
+   tür **Non-Consumable**, fiyat **299,99 ₺** (Türkiye vitrini).
+   Türkçe görünen ad: "King Skor Premium — Ömür Boyu".
+2. **Abonelikler → Abonelik Grubu Oluştur** ("Premium" grubu) →
+   içine **`king_premium_yillik`** — süre **1 yıl**, fiyat **149,99 ₺**.
+   Türkçe görünen ad: "King Skor Premium — Yıllık". Başka süre (aylık/haftalık)
+   EKLEMEYİN.
 3. Uygulama açıklamasının **en altına** Apple'ın standart EULA linkini ekleyin:
    `Kullanım Koşulları: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`
 4. **Small Business Program**'a kayıt olun → komisyon %30 yerine **%15**.
@@ -141,16 +149,18 @@ Kod tarafında yapılacak tek şey: `src/servisler/satinalma.ts` içindeki
 
 ### 2. Google Play Console
 
-**Ürünler → Uygulama içi ürünler**: `king_pro_lifetime`, tek seferlik, 199 ₺.
+- **Ürünler → Uygulama içi ürünler**: `king_pro_lifetime`, tek seferlik, 299,99 ₺.
+- **Ürünler → Abonelikler**: `king_premium_yillik`, temel plan 1 yıl, 149,99 ₺.
 
 ### 3. RevenueCat panosu
 
 1. Proje oluşturun, iOS ve Android uygulamalarını bağlayın
    (bundle id: `com.kosko.kingskor`).
 2. **Entitlements**: `pro` adında entitlement oluşturun.
-3. **Products**: mağazalardan `king_pro_lifetime` ürününü içe aktarın ve
-   `pro` entitlement'ına bağlayın.
-4. **Offerings**: `default` offering'e Lifetime paketi olarak ekleyin.
+3. **Products**: mağazalardan `king_pro_lifetime` ve `king_premium_yillik`
+   ürünlerini içe aktarın; İKİSİNİ DE `pro` entitlement'ına bağlayın.
+4. **Offerings**: `default` offering'e **Annual** (yıllık) ve **Lifetime**
+   paketlerini ekleyin.
 5. **API Keys** sayfasındaki `appl_...` ve `goog_...` public anahtarlarını
    `satinalma.ts`'e yazın.
 

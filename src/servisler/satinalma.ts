@@ -1,6 +1,7 @@
-// RevenueCat entegrasyonu (sunucusuz lisans yönetimi). Tek ürün: ömür boyu Pro.
+// RevenueCat entegrasyonu (sunucusuz lisans yönetimi). İki ürün:
+// yıllık abonelik + ömür boyu (non-consumable); ikisi de aynı entitlement'ı açar.
 // Native modül yoksa (Expo Go) uygulama çalışmaya devam eder, satın alma kapalı olur.
-// Offline'da MMKV'deki son bilinen Pro durumu geçerlidir.
+// Offline'da MMKV'deki son bilinen Premium durumu geçerlidir.
 
 import { Platform } from 'react-native';
 import Purchases, {
@@ -16,6 +17,7 @@ const REVENUECAT_GOOGLE_KEY = 'goog_XXXXXXXXXXXXXXXX';
 
 export const ENTITLEMENT_ADI = 'pro';
 export const URUN_PRO = 'king_pro_lifetime'; // non-consumable, tek seferlik
+export const URUN_YILLIK = 'king_premium_yillik'; // otomatik yenilenen yıllık abonelik
 
 let baslatildi = false;
 
@@ -44,17 +46,23 @@ export interface ProPaketi {
   fiyatMetni: string; // mağazadan dinamik gelir, koda sabit yazılmaz
 }
 
-/** Paywall için mağazadaki ömür boyu paketi getirir. */
-export async function proPaketiGetir(): Promise<ProPaketi | null> {
+export interface PremiumPaketleri {
+  omurBoyu: ProPaketi | null;
+  yillik: ProPaketi | null;
+}
+
+/** Paywall için mağazadaki yıllık + ömür boyu paketleri getirir. */
+export async function premiumPaketleriGetir(): Promise<PremiumPaketleri> {
   try {
     const teklifler = await Purchases.getOfferings();
     const paketler = teklifler.current?.availablePackages ?? [];
-    const paket =
-      paketler.find((p) => p.product.identifier.includes(URUN_PRO)) ?? paketler[0];
-    if (!paket) return null;
-    return { paket, fiyatMetni: paket.product.priceString };
+    const bul = (urunId: string) =>
+      paketler.find((p) => p.product.identifier.includes(urunId)) ?? null;
+    const sar = (paket: PurchasesPackage | null): ProPaketi | null =>
+      paket ? { paket, fiyatMetni: paket.product.priceString } : null;
+    return { omurBoyu: sar(bul(URUN_PRO)), yillik: sar(bul(URUN_YILLIK)) };
   } catch {
-    return null;
+    return { omurBoyu: null, yillik: null };
   }
 }
 
