@@ -31,6 +31,7 @@ import { Konfeti } from '@/bilesenler/Konfeti';
 import { SkorTablosu } from '@/bilesenler/SkorTablosu';
 import { sonucBelirle } from '@/core/skor';
 import type { Oyuncu, SonucDurumu } from '@/core/tipler';
+import { belkiDegerlendirmeIste } from '@/servisler/degerlendirme';
 import { goruntuyuPaylas } from '@/servisler/paylas';
 import { sesCal } from '@/servisler/ses';
 import { kimlikUret } from '@/store/depo';
@@ -145,6 +146,10 @@ export default function SonucEkrani() {
     } else if (sonuc.durum === 'UC_BATTI') {
       sesCal('kayip');
     }
+    // Puan penceresi: maskot sahnesi bittikten sonra, en az 2. bitmiş masada
+    const bitenMasaSayisi = useMasaStore.getState().gecmis.length + 1;
+    const zamanlayici = setTimeout(() => belkiDegerlendirmeIste(bitenMasaSayisi), 3500);
+    return () => clearTimeout(zamanlayici);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

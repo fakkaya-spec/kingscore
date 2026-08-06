@@ -16,6 +16,7 @@ interface AyarDurumu {
   tema: Tema;
   masaGorunumu: MasaGorunumu; // masa ekranındaki Genel/Detaylı sekmesi
   puanTablosu: PuanTablosu; // yeni masalara kopyalanacak taslak
+  degerlendirmeIstendi: boolean; // App Store puan penceresi yalnızca bir kez tetiklenir
 
   seslerAc: (acik: boolean) => void;
   animasyonlarAc: (acik: boolean) => void;
@@ -24,6 +25,7 @@ interface AyarDurumu {
   masaGorunumuSec: (gorunum: MasaGorunumu) => void;
   puanGuncelle: (alan: keyof PuanTablosu, deger: number) => void;
   varsayilanaDon: () => void;
+  degerlendirmeIstendiIsaretle: () => void;
 }
 
 export const useAyarStore = create<AyarDurumu>()(
@@ -35,6 +37,7 @@ export const useAyarStore = create<AyarDurumu>()(
       tema: 'yaz',
       masaGorunumu: 'detayli',
       puanTablosu: { ...VARSAYILAN_PUAN_TABLOSU },
+      degerlendirmeIstendi: false,
 
       seslerAc: (acik) => set({ sesler: acik }),
       animasyonlarAc: (acik) => set({ animasyonlar: acik }),
@@ -44,6 +47,7 @@ export const useAyarStore = create<AyarDurumu>()(
       puanGuncelle: (alan, deger) =>
         set((d) => ({ puanTablosu: { ...d.puanTablosu, [alan]: deger } })),
       varsayilanaDon: () => set({ puanTablosu: { ...VARSAYILAN_PUAN_TABLOSU } }),
+      degerlendirmeIstendiIsaretle: () => set({ degerlendirmeIstendi: true }),
     }),
     {
       name: 'king-skor-ayarlar',
