@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -120,6 +120,8 @@ function DonenTac({ renk }: { renk: string }) {
 export default function SonucEkrani() {
   const router = useRouter();
   const r = useRenkler();
+  // Maskota dokununca sahne baştan oynar, ses tekrar çalar (masada makara garantisi)
+  const [sahneTekrari, setSahneTekrari] = React.useState(0);
   const masa = useMasaStore((d) => d.aktifMasa);
   const { masayiKapat, masaKur } = useMasaStore();
   const proMu = usePro();
@@ -210,18 +212,42 @@ export default function SonucEkrani() {
   return (
     <View style={[stiller.govde, { backgroundColor: r.zemin }]}>
       <ScrollView contentContainerStyle={stiller.icerik}>
-        {/* Sahne: tek başına çıkana taçlı horoz, tek başına batana tavuk */}
+        {/* Sahne: tek başına çıkana taçlı horoz, tek başına batana tavuk.
+            Maskota dokununca animasyon ve ses baştan oynar. */}
         <View style={stiller.sahne}>
           {sonuc.durum === 'TEK_KRAL' ? (
-            <HorozSahnesi animasyonlu={animasyonlarAcik} />
+            <Pressable
+              accessibilityLabel="Horozu tekrar öttür"
+              onPress={() => {
+                sesCal('horoz');
+                setSahneTekrari((n) => n + 1);
+              }}
+            >
+              <HorozSahnesi key={sahneTekrari} animasyonlu={animasyonlarAcik} />
+            </Pressable>
           ) : sonuc.durum === 'TEK_TAVUK' ? (
-            <TavukSahnesi animasyonlu={animasyonlarAcik} />
+            <Pressable
+              accessibilityLabel="Tavuğu tekrar gıdaklat"
+              onPress={() => {
+                sesCal('tavuk');
+                setSahneTekrari((n) => n + 1);
+              }}
+            >
+              <TavukSahnesi key={sahneTekrari} animasyonlu={animasyonlarAcik} />
+            </Pressable>
           ) : animasyonlarAcik ? (
             <SahneIkonu Ikon={sahne.Ikon} durum={sonuc.durum} renk={r.altin} />
           ) : (
             <sahne.Ikon color={r.altin} size={96} strokeWidth={1.75} />
           )}
           <Text style={[stiller.sahneBaslik, { color: r.altin }]}>{sahne.baslik}</Text>
+          {(sonuc.durum === 'TEK_KRAL' || sonuc.durum === 'TEK_TAVUK') && (
+            <Text style={[stiller.sahneDokunNotu, { color: r.soluk }]}>
+              {sonuc.durum === 'TEK_KRAL'
+                ? 'Horoza dokun, bir daha ötsün'
+                : 'Tavuğa dokun, bir daha gıdaklasın'}
+            </Text>
+          )}
           {sonuc.durum === 'UC_BATTI' && (
             <Text style={[stiller.sahneAlt, { color: r.soluk }]}>
               {kaybedenler.map((s) => s.oyuncu.ad).join(' · ')}
@@ -357,6 +383,7 @@ const stiller = StyleSheet.create({
   icerik: { padding: 16, paddingBottom: 32 },
   sahne: { alignItems: 'center', paddingVertical: 16 },
   sahneBaslik: { fontSize: 24, fontWeight: '900', textAlign: 'center', marginTop: 8 },
+  sahneDokunNotu: { fontSize: 13, fontWeight: '600', marginTop: 6 },
   sahneAlt: { fontSize: 16, marginTop: 8 },
   uyari: {
     borderRadius: 12,
