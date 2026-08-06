@@ -111,18 +111,3 @@ export function oyunAciklamasi(tur: OyunTuru, tablo: PuanTablosu): string {
       return `kupa papazını alan −${Math.abs(birim)}`;
   }
 }
-
-export const OYUNCU_EMOJILERI = [
-  '🦊',
-  '🐻',
-  '🦁',
-  '🐼',
-  '🐸',
-  '🐵',
-  '🦉',
-  '🐺',
-  '🐯',
-  '🐨',
-  '🐰',
-  '🦅',
-];

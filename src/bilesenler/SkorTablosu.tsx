@@ -28,7 +28,7 @@ export function SkorTablosu({ masa, onSatirUzunBas, hakGoster = true }: Props) {
         {masa.oyuncular.map((o) => (
           <View key={o.id} style={stiller.hucre}>
             <View style={stiller.oyuncuBasligi}>
-              <Avatar emoji={o.emoji} foto={o.foto} boyut={18} />
+              <Avatar ad={o.ad} foto={o.foto} boyut={18} />
               <Text style={[stiller.oyuncuAdi, { color: r.altin }]} numberOfLines={1}>
                 {o.ad}
               </Text>

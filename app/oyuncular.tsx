@@ -16,7 +16,6 @@ import {
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Avatar } from '@/bilesenler/Avatar';
 import { Buton } from '@/bilesenler/Buton';
-import { OYUNCU_EMOJILERI } from '@/core/sabitler';
 import type { Oyuncu } from '@/core/tipler';
 import { fotoSec, fotoSil } from '@/servisler/foto';
 import { davetPaylas } from '@/servisler/paylas';
@@ -44,15 +43,12 @@ export default function OyuncularEkrani() {
   const [formAcik, setFormAcik] = useState(false);
   const [duzenlenenId, setDuzenlenenId] = useState<string | null>(null);
   const [formAd, setFormAd] = useState('');
-  const [formEmoji, setFormEmoji] = useState(OYUNCU_EMOJILERI[0]);
   const [formFoto, setFormFoto] = useState<string | undefined>(undefined);
   // Düzenlenen oyuncunun kayıtlı fotoğrafı: vazgeçilirse dosyası korunmalı
   const [eskiFoto, setEskiFoto] = useState<string | undefined>(undefined);
 
   // Hızlı giriş (havuz 4 kişiden azken eski yol)
   const [adlar, setAdlar] = useState<string[]>(['', '', '', '']);
-  const [emojiler, setEmojiler] = useState<string[]>(OYUNCU_EMOJILERI.slice(0, 4));
-  const [acikEmojiSecici, setAcikEmojiSecici] = useState<number | null>(null);
 
   const baslat = (oyuncular: [Oyuncu, Oyuncu, Oyuncu, Oyuncu], ad?: string) => {
     if (!yeniMasaHakkiVarMi(proMu)) {
@@ -99,19 +95,14 @@ export default function OyuncularEkrani() {
     const oyuncular = secililer.map((o) => ({
       id: kimlikUret(),
       ad: o.ad,
-      emoji: o.emoji,
       foto: o.foto,
     })) as [Oyuncu, Oyuncu, Oyuncu, Oyuncu];
     baslat(oyuncular, masaAdi);
   };
 
-  const bosEmoji = () =>
-    OYUNCU_EMOJILERI.find((e) => !havuz.some((o) => o.emoji === e)) ?? OYUNCU_EMOJILERI[0];
-
   const formuAc = (oyuncu?: HavuzOyuncusu) => {
     setDuzenlenenId(oyuncu?.id ?? null);
     setFormAd(oyuncu?.ad ?? '');
-    setFormEmoji(oyuncu?.emoji ?? bosEmoji());
     setFormFoto(oyuncu?.foto);
     setEskiFoto(oyuncu?.foto);
     setFormAcik(true);
@@ -147,8 +138,8 @@ export default function OyuncularEkrani() {
       Alert.alert('İsim zaten var', 'Havuzdaki her oyuncunun adı farklı olmalı.');
       return;
     }
-    if (duzenlenenId) havuzdaGuncelle(duzenlenenId, ad, formEmoji, formFoto);
-    else havuzaEkle(ad, formEmoji, formFoto);
+    if (duzenlenenId) havuzdaGuncelle(duzenlenenId, ad, formFoto);
+    else havuzaEkle(ad, formFoto);
     formuKapat(true);
   };
 
@@ -182,12 +173,11 @@ export default function OyuncularEkrani() {
       const varMi = havuz.some(
         (o) => o.ad.toLocaleLowerCase('tr') === kucukler[i],
       );
-      if (!varMi) havuzaEkle(temizAdlar[i], emojiler[i]);
+      if (!varMi) havuzaEkle(temizAdlar[i]);
     }
-    const oyuncular = temizAdlar.map((ad, i) => ({
+    const oyuncular = temizAdlar.map((ad) => ({
       id: kimlikUret(),
       ad,
-      emoji: emojiler[i],
     })) as [Oyuncu, Oyuncu, Oyuncu, Oyuncu];
     baslat(oyuncular, masaAdi);
   };
@@ -236,7 +226,7 @@ export default function OyuncularEkrani() {
                     },
                   ]}
                 >
-                  <Avatar emoji={oyuncu.emoji} foto={oyuncu.foto} boyut={34} />
+                  <Avatar ad={oyuncu.ad} foto={oyuncu.foto} boyut={34} />
                   <Text
                     numberOfLines={1}
                     style={[stiller.kartAd, { color: secili ? r.kartUstu : r.metin }]}
@@ -280,7 +270,7 @@ export default function OyuncularEkrani() {
       {formAcik && (
         <View style={[stiller.form, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}>
           <View style={stiller.formSatiri}>
-            <Avatar emoji={formEmoji} foto={formFoto} boyut={40} />
+            <Avatar ad={formAd} foto={formFoto} boyut={40} />
             <TextInput
               value={formAd}
               onChangeText={setFormAd}
@@ -313,15 +303,6 @@ export default function OyuncularEkrani() {
               />
             )}
           </View>
-          <View style={stiller.emojiPaleti}>
-            {OYUNCU_EMOJILERI.map((e) => (
-              <Pressable key={e} onPress={() => setFormEmoji(e)} style={stiller.emojiSecim}>
-                <Text style={[stiller.paletEmoji, formEmoji === e && stiller.seciliEmoji]}>
-                  {e}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
           <View style={stiller.formSatiri}>
             <Buton
               baslik="Vazgeç"
@@ -349,16 +330,7 @@ export default function OyuncularEkrani() {
           </Text>
           {adlar.map((ad, i) => (
             <View key={i} style={stiller.oyuncuSatiri}>
-              <Pressable
-                accessibilityLabel={`${i + 1}. oyuncu için emoji seç`}
-                onPress={() => setAcikEmojiSecici(acikEmojiSecici === i ? null : i)}
-                style={[
-                  stiller.emojiKutusu,
-                  { backgroundColor: r.zeminKoyu, borderColor: r.cizgi },
-                ]}
-              >
-                <Text style={stiller.kartEmoji}>{emojiler[i]}</Text>
-              </Pressable>
+              <Avatar ad={ad.trim() || `${i + 1}`} boyut={40} />
               <TextInput
                 value={ad}
                 onChangeText={(yeni) => {
@@ -376,27 +348,6 @@ export default function OyuncularEkrani() {
               />
             </View>
           ))}
-
-          {acikEmojiSecici !== null && (
-            <View
-              style={[stiller.emojiPaleti, { backgroundColor: r.zeminKoyu, borderColor: r.altin }]}
-            >
-              {OYUNCU_EMOJILERI.map((e) => (
-                <Pressable
-                  key={e}
-                  onPress={() => {
-                    const kopya = [...emojiler];
-                    kopya[acikEmojiSecici] = e;
-                    setEmojiler(kopya);
-                    setAcikEmojiSecici(null);
-                  }}
-                  style={stiller.emojiSecim}
-                >
-                  <Text style={stiller.paletEmoji}>{e}</Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
         </>
       )}
 
@@ -466,7 +417,6 @@ const stiller = StyleSheet.create({
     gap: 4,
   },
   yeniKarti: { borderStyle: 'dashed', backgroundColor: 'transparent' },
-  kartEmoji: { fontSize: 28 },
   kartAd: { fontSize: 14, fontWeight: '700', maxWidth: '100%' },
   siraRozeti: {
     position: 'absolute',
@@ -483,14 +433,6 @@ const stiller = StyleSheet.create({
   formSatiri: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   esit: { flex: 1 },
   oyuncuSatiri: { flexDirection: 'row', gap: 10, alignItems: 'center' },
-  emojiKutusu: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   girdi: {
     flex: 1,
     minHeight: 56,
@@ -501,21 +443,6 @@ const stiller = StyleSheet.create({
     fontWeight: '600',
   },
   masaAdiGirdisi: { marginTop: 4 },
-  emojiPaleti: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    borderRadius: 14,
-    padding: 4,
-    gap: 4,
-  },
-  emojiSecim: {
-    width: 52,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  paletEmoji: { fontSize: 28, opacity: 0.9 },
-  seciliEmoji: { transform: [{ scale: 1.25 }], opacity: 1 },
   altNot: {
     flexDirection: 'row',
     alignItems: 'center',

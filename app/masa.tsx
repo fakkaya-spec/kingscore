@@ -49,7 +49,7 @@ function GenelGorunum({ masa }: { masa: Masa }) {
             ]}
           >
             <View style={stiller.genelAdSatiri}>
-              <Avatar emoji={oyuncu.emoji} foto={oyuncu.foto} boyut={30} />
+              <Avatar ad={oyuncu.ad} foto={oyuncu.foto} boyut={30} />
               <Text
                 numberOfLines={1}
                 style={[stiller.genelAd, { color: liderMi ? r.kartUstu : r.metin }]}
@@ -283,7 +283,7 @@ export default function MasaEkrani() {
           style={[stiller.siraBandi, { backgroundColor: r.altin }]}
         >
           <View style={stiller.siraSatiri}>
-            <Avatar emoji={sirali.emoji} foto={sirali.foto} boyut={24} />
+            <Avatar ad={sirali.ad} foto={sirali.foto} boyut={24} />
             <Text style={stiller.siraMetni}>SIRA: {sirali.ad.toLocaleUpperCase('tr')}</Text>
           </View>
           <Text style={stiller.siraAlt}>

@@ -54,7 +54,7 @@ export default function OyunSecEkrani() {
     return (
       <ScrollView style={{ backgroundColor: r.zemin }} contentContainerStyle={stiller.icerik}>
         <Text style={[stiller.baslik, { color: r.metin }]}>
-          {oyuncu.emoji} {oyuncu.ad} — kozunu seç
+          {oyuncu.ad} — kozunu seç
         </Text>
         <View style={stiller.kozIzgara}>
           {KOZLAR.map((koz) => {
@@ -83,7 +83,7 @@ export default function OyunSecEkrani() {
   return (
     <ScrollView style={{ backgroundColor: r.zemin }} contentContainerStyle={stiller.icerik}>
       <Text style={[stiller.baslik, { color: r.metin }]}>
-        {oyuncu.emoji} {oyuncu.ad} —{' '}
+        {oyuncu.ad} —{' '}
         {duzenlenenEl ? `${duzenlenenEl.sira}. eli düzenle` : 'oyununu seç'}
       </Text>
       {secenekler.map(({ tur, secilebilir, neden }) => (

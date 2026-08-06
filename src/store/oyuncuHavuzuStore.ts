@@ -8,15 +8,15 @@ import { kimlikUret, mmkvDepo } from './depo';
 export interface HavuzOyuncusu {
   id: string;
   ad: string;
-  emoji: string;
+  emoji?: string; // eski kayıtlarla uyumluluk için duruyor; arayüzde artık kullanılmıyor
   foto?: string; // cihazdaki fotoğraf dosyasının yolu (opsiyonel)
 }
 
 interface HavuzDurumu {
   havuz: HavuzOyuncusu[];
 
-  havuzaEkle: (ad: string, emoji: string, foto?: string) => HavuzOyuncusu;
-  havuzdaGuncelle: (id: string, ad: string, emoji: string, foto?: string) => void;
+  havuzaEkle: (ad: string, foto?: string) => HavuzOyuncusu;
+  havuzdaGuncelle: (id: string, ad: string, foto?: string) => void;
   havuzdanSil: (id: string) => void;
 }
 
@@ -25,15 +25,15 @@ export const useOyuncuHavuzuStore = create<HavuzDurumu>()(
     (set) => ({
       havuz: [],
 
-      havuzaEkle: (ad, emoji, foto) => {
-        const oyuncu: HavuzOyuncusu = { id: kimlikUret(), ad: ad.trim(), emoji, foto };
+      havuzaEkle: (ad, foto) => {
+        const oyuncu: HavuzOyuncusu = { id: kimlikUret(), ad: ad.trim(), foto };
         set((d) => ({ havuz: [...d.havuz, oyuncu] }));
         return oyuncu;
       },
 
-      havuzdaGuncelle: (id, ad, emoji, foto) =>
+      havuzdaGuncelle: (id, ad, foto) =>
         set((d) => ({
-          havuz: d.havuz.map((o) => (o.id === id ? { ...o, ad: ad.trim(), emoji, foto } : o)),
+          havuz: d.havuz.map((o) => (o.id === id ? { ...o, ad: ad.trim(), foto } : o)),
         })),
 
       havuzdanSil: (id) =>

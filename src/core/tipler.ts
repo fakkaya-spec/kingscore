@@ -14,8 +14,8 @@ export type Koz = 'MACA' | 'KUPA' | 'KARO' | 'SINEK';
 export interface Oyuncu {
   id: string;
   ad: string;
-  emoji: string;
-  foto?: string; // cihazdaki fotoğraf dosyasının yolu; yoksa emoji gösterilir
+  emoji?: string; // eski kayıtlarla uyumluluk için duruyor; arayüzde artık kullanılmıyor
+  foto?: string; // cihazdaki fotoğraf dosyasının yolu; yoksa adın baş harfi gösterilir
 }
 
 /** Birim puanlar. Cezalar negatif tutulur (ör. kupaAlmaz = -30). */

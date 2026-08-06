@@ -160,7 +160,7 @@ export default function ElGirisEkrani() {
             >
               <View style={stiller.oyuncuBilgi}>
                 <Text style={[stiller.oyuncuAdi, { color: r.metin }]} numberOfLines={1}>
-                  {o.emoji} {o.ad}
+                  {o.ad}
                 </Text>
                 {/* Canlı puan önizlemesi */}
                 <Text

@@ -26,6 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Avatar } from '@/bilesenler/Avatar';
 import { Buton } from '@/bilesenler/Buton';
+import { HorozSahnesi, TavukSahnesi } from '@/bilesenler/HorozTavuk';
 import { Konfeti } from '@/bilesenler/Konfeti';
 import { SkorTablosu } from '@/bilesenler/SkorTablosu';
 import { sonucBelirle } from '@/core/skor';
@@ -187,7 +188,7 @@ export default function SonucEkrani() {
             const varMi = havuz.some(
               (h) => h.ad.toLocaleLowerCase('tr') === o.ad.toLocaleLowerCase('tr'),
             );
-            if (!varMi) havuzaEkle(o.ad, o.emoji, o.foto);
+            if (!varMi) havuzaEkle(o.ad, o.foto);
           }
           masayiKapat();
           router.replace('/oyuncular');
@@ -200,9 +201,13 @@ export default function SonucEkrani() {
   return (
     <View style={[stiller.govde, { backgroundColor: r.zemin }]}>
       <ScrollView contentContainerStyle={stiller.icerik}>
-        {/* Sahne */}
+        {/* Sahne: tek başına çıkana taçlı horoz, tek başına batana tavuk */}
         <View style={stiller.sahne}>
-          {animasyonlarAcik ? (
+          {sonuc.durum === 'TEK_KRAL' ? (
+            <HorozSahnesi animasyonlu={animasyonlarAcik} />
+          ) : sonuc.durum === 'TEK_TAVUK' ? (
+            <TavukSahnesi animasyonlu={animasyonlarAcik} />
+          ) : animasyonlarAcik ? (
             <SahneIkonu Ikon={sahne.Ikon} durum={sonuc.durum} renk={r.altin} />
           ) : (
             <sahne.Ikon color={r.altin} size={96} strokeWidth={1.75} />
@@ -249,7 +254,7 @@ export default function SonucEkrani() {
                   </View>
                   <Text style={[stiller.siraNo, { color: r.soluk }]}>{satir.sira}.</Text>
                   <View style={stiller.siraAdSatiri}>
-                    <Avatar emoji={satir.oyuncu.emoji} foto={satir.oyuncu.foto} boyut={24} />
+                    <Avatar ad={satir.oyuncu.ad} foto={satir.oyuncu.foto} boyut={24} />
                     <Text style={[stiller.siraAd, { color: r.metin }]} numberOfLines={1}>
                       {satir.oyuncu.ad}
                     </Text>
