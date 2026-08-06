@@ -1,7 +1,7 @@
 // Ana ekran: büyük YENİ MASA kartı + devam eden masa kartı; diğerleri alt ikon satırında.
 
 import { useRouter } from 'expo-router';
-import { BookOpen, History, Lock, Play, Settings, Spade } from 'lucide-react-native';
+import { BookOpen, Crown, History, Lock, Play, Settings, Spade } from 'lucide-react-native';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -73,6 +73,29 @@ export default function AnaEkran() {
           <Text style={stiller.yeniMasaAlt}>4 oyuncu seç, dağıtmaya başla</Text>
         </Pressable>
 
+        {!proMu && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="King Skor Premium"
+            onPress={() => {
+              hafifTitret();
+              router.push('/paywall');
+            }}
+            style={({ pressed }) => [
+              stiller.premiumKarti,
+              { backgroundColor: r.zeminKoyu, borderColor: r.altin, opacity: pressed ? 0.85 : 1 },
+            ]}
+          >
+            <Crown color={r.altin} size={22} strokeWidth={2.25} />
+            <View style={stiller.premiumMetinler}>
+              <Text style={[stiller.premiumBaslik, { color: r.altin }]}>King Skor Premium</Text>
+              <Text style={[stiller.premiumAlt, { color: r.soluk }]}>
+                Sınırsız masa · yıllık veya ömür boyu
+              </Text>
+            </View>
+          </Pressable>
+        )}
+
         <View style={[stiller.altSatir, { borderColor: r.cizgi }]}>
           {altSatir.map(({ ad, Ikon, git }) => (
             <Pressable
@@ -124,6 +147,19 @@ const stiller = StyleSheet.create({
   },
   yeniMasaMetni: { fontSize: 30, fontWeight: '900', color: '#1A1A1A', letterSpacing: 2 },
   yeniMasaAlt: { fontSize: 14, fontWeight: '600', color: '#1A1A1A', opacity: 0.7 },
+  premiumKarti: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 2,
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  premiumMetinler: { flex: 1 },
+  premiumBaslik: { fontSize: 17, fontWeight: '800' },
+  premiumAlt: { fontSize: 13, marginTop: 2 },
   altSatir: {
     flexDirection: 'row',
     justifyContent: 'space-around',
