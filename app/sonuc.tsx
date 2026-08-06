@@ -136,9 +136,13 @@ export default function SonucEkrani() {
       return;
     }
     if (!sonuc) return;
-    if (sonuc.durum === 'TEK_KRAL' || sonuc.durum === 'IKILI_CIKIS') {
+    if (sonuc.durum === 'TEK_KRAL') {
+      sesCal('horoz'); // tek başına çıkan kralı horoz ötüşü karşılar
+    } else if (sonuc.durum === 'TEK_TAVUK') {
+      sesCal('tavuk'); // tek başına batana gıt gıt gıdak
+    } else if (sonuc.durum === 'IKILI_CIKIS') {
       sesCal('zafer');
-    } else if (sonuc.durum === 'TEK_TAVUK' || sonuc.durum === 'UC_BATTI') {
+    } else if (sonuc.durum === 'UC_BATTI') {
       sesCal('kayip');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -5,7 +5,7 @@
 import { createAudioPlayer } from 'expo-audio';
 import { useAyarStore } from '@/store/ayarStore';
 
-export type SesAdi = 'zafer' | 'kayip' | 'kart' | 'king' | 'rifki';
+export type SesAdi = 'zafer' | 'kayip' | 'kart' | 'king' | 'rifki' | 'horoz' | 'tavuk';
 
 const KAYNAKLAR: Record<SesAdi, number> = {
   zafer: require('../../assets/sesler/zafer.wav'),
@@ -13,6 +13,8 @@ const KAYNAKLAR: Record<SesAdi, number> = {
   kart: require('../../assets/sesler/kart.wav'),
   king: require('../../assets/sesler/king.wav'),
   rifki: require('../../assets/sesler/rifki.wav'),
+  horoz: require('../../assets/sesler/horoz.wav'),
+  tavuk: require('../../assets/sesler/tavuk.wav'),
 };
 
 export function sesCal(ad: SesAdi): void {
