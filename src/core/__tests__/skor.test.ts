@@ -380,6 +380,26 @@ describe('sonucBelirle', () => {
     expect(sonucBelirle(masaYap()).durum).toBe('BERABERE');
   });
 
+  test('0 puanla bitiren batmış sayılmaz: iki artı + bir sıfır + bir eksi → TEK_TAVUK', () => {
+    // o1 +100, o2 +100, o3 0, o4 -200 → yalnızca o4 batar; o3 çıkanlardandır
+    const masa = masaYap([
+      elYap('KOZ', { o1: 2, o2: 2, o3: 0, o4: 0 }, 'o1', 'MACA'), // o1 +100, o2 +100
+      elYap('KIZ_ALMAZ', { o1: 0, o2: 0, o3: 0, o4: 2 }, 'o4'), // o4 -200
+    ]);
+    const sonuc = sonucBelirle(masa);
+    expect(sonuc.durum).toBe('TEK_TAVUK');
+    expect(sonuc.siralama[3].oyuncu.id).toBe('o4');
+  });
+
+  test('0 puanla bitiren çıkanlara sayılır: bir artı + bir sıfır + iki eksi → IKILI_CIKIS', () => {
+    // o1 +200, o2 0, o3 -100, o4 -100 → iki kişi battı, o2 sıfırla çıktı
+    const masa = masaYap([
+      elYap('KOZ', { o1: 4, o2: 0, o3: 0, o4: 0 }, 'o1', 'KUPA'), // o1 +200
+      elYap('KIZ_ALMAZ', { o1: 0, o2: 0, o3: 1, o4: 1 }, 'o3'), // o3 -100, o4 -100
+    ]);
+    expect(sonucBelirle(masa).durum).toBe('IKILI_CIKIS');
+  });
+
   test('aynı puanlar aynı sırayı paylaşır', () => {
     const masa = masaYap([
       elYap('KOZ', { o1: 6, o2: 6, o3: 1, o4: 0 }, 'o1', 'MACA'),

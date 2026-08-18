@@ -6,6 +6,7 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Buton } from '@/bilesenler/Buton';
 import { MikroAnimasyon, type MikroTur } from '@/bilesenler/MikroAnimasyon';
+import { SkorSeridi } from '@/bilesenler/SkorSeridi';
 import { Stepper } from '@/bilesenler/Stepper';
 import { HEDEF_BIRIM, KOZ_SIMGESI, OYUN_ADI } from '@/core/sabitler';
 import { elDogrula, kingYapanOyuncu, puanHesapla } from '@/core/skor';
@@ -149,6 +150,11 @@ export default function ElGirisEkrani() {
         </Text>
       </View>
 
+      {/* El sayılırken "kaçtayım?" sorusuna güncel toplamlarla cevap verilir */}
+      <View style={stiller.seritAraligi}>
+        <SkorSeridi masa={masa} />
+      </View>
+
       <ScrollView contentContainerStyle={stiller.liste}>
         {masa.oyuncular.map((o) => {
           const puan = onizleme[o.id] ?? 0;
@@ -236,6 +242,7 @@ const stiller = StyleSheet.create({
     marginBottom: 12,
   },
   sayacMetni: { fontSize: 20, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  seritAraligi: { marginBottom: 12 },
   liste: { gap: 10, paddingBottom: 12 },
   oyuncuSatiri: {
     flexDirection: 'row',

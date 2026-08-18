@@ -12,6 +12,7 @@ import {
   OYUN_ADI,
   oyunAciklamasi,
 } from '@/core/sabitler';
+import { SkorSeridi } from '@/bilesenler/SkorSeridi';
 import { secilebilirOyunlar, siradakiOyuncu } from '@/core/skor';
 import type { Koz, OyunTuru } from '@/core/tipler';
 import { hafifTitret } from '@/servisler/titresim';
@@ -86,6 +87,8 @@ export default function OyunSecEkrani() {
         {oyuncu.ad} —{' '}
         {duzenlenenEl ? `${duzenlenenEl.sira}. eli düzenle` : 'oyununu seç'}
       </Text>
+      {/* Karar verilirken "kaçtayım?" diye soranlara ekrandan bakılır */}
+      <SkorSeridi masa={masa} />
       {secenekler.map(({ tur, secilebilir, neden }) => (
         <Pressable
           key={tur}

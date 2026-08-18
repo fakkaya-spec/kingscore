@@ -274,17 +274,16 @@ export function sonucBelirle(masa: Masa): MasaSonucu {
     satir.sira = sira;
   });
 
-  const artida = siralama.filter((s) => s.puan > 0).length;
+  // Batan = eksiye düşen oyuncudur; 0'da kapatan ÇIKMIŞ sayılır (kaybetmez).
+  // Toplam her zaman 0 olduğundan durum, batan sayısından tek başına çıkar.
   const ekside = siralama.filter((s) => s.puan < 0).length;
 
   let durum: SonucDurumu;
-  if (artida === 0 && ekside === 0) durum = 'BERABERE';
-  else if (artida === 1 && ekside === 3) durum = 'TEK_KRAL';
-  else if (artida === 2) durum = 'IKILI_CIKIS';
+  if (ekside === 0) durum = 'BERABERE'; // kimse batmadıysa herkes 0'dadır
   else if (ekside === 1) durum = 'TEK_TAVUK';
-  else if (ekside >= 3) durum = 'UC_BATTI';
-  else if (artida === 1) durum = 'TEK_KRAL';
-  else durum = 'BERABERE';
+  else if (ekside === 2) durum = 'IKILI_CIKIS';
+  else if (siralama[0].puan > 0) durum = 'TEK_KRAL'; // üçü battı, tepedeki tek başına çıktı
+  else durum = 'UC_BATTI'; // ancak toplam 0 tutmuyorsa düşülebilecek emniyet dalı
 
   return {
     siralama: siralama.map(({ oyuncu, puan, sira: s, kingSayisi }) => ({
