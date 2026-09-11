@@ -14,3 +14,7 @@
   Ücretsizde toplam 5 deneme masası (UCRETSIZ_MASA_HAKKI).
   Başlamış masa asla kilitlenmez; aylık/haftalık ürün ekleme.
 - Yasaklar: backend/auth/analytics/reklam yok; yıllık dışında abonelik yok; i18n katmanı yok.
+- **Mağaza gönderim disiplini:** Hiçbir App Store / Google Play gönderimi,
+  `YAYIN-KONTROL-LISTESI.md` baştan sona işaretlenmeden yapılmaz ve yapılması
+  önerilmez. Her ret/istek, listeye yeni bir madde olarak işlenir. Yeni bir
+  uygulama projesi başlatılırken bu liste ilk iş olarak projeye kopyalanır.

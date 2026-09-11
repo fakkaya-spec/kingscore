@@ -43,6 +43,13 @@ nedenlerinden damıtılmıştır. (Google Play bölümü en altta.)
 - [ ] "Sign-in required" işareti KAPALI (hesap sistemi yok)
 - [ ] İletişim ad/telefon/e-posta dolu
 - [ ] Abonelik ürünlerinin **Review Screenshot**'ı yüklü (1242×2208)
+- [ ] **"Information Needed" hazırlığı BAŞTAN yapılmış** (King Skor'da 3 hafta
+      kaybettiren tur): Review Notes'a şu 8 bilgi en baştan yazılır —
+      test edilen cihaz/OS, uygulama tanımı + hedef kitle, kurulum adımları,
+      kullanılan dış servisler (ör. RevenueCat/StoreKit), bölgesel fark
+      olmadığı, regüle sektör olmadığı, IAP ile ne alınabildiği + paywall'a
+      giden yol; ayrıca çekirdek akışı + satın almayı gösteren ekran videosu
+      gönderimden ÖNCE çekilip hazır bekletilir
 
 ## E) Gönderim paketi
 
@@ -68,6 +75,20 @@ nedenlerinden damıtılmıştır. (Google Play bölümü en altta.)
 - [ ] Feature graphic 1024×500 + telefon görselleri 1080×1920
 - [ ] Veri güvenliği formu + içerik derecelendirme anketi
 - [ ] play.google.com görünür geliştirici adı ayarlandı
+
+## H) Gönderim SONRASI takip (sessizlik yönetimi)
+
+- [ ] "Waiting for Review"a geçtiği gün not edildi; 3 iş günü sessizlikte
+      mesaj dizisine nazik takip notu yazılır
+- [ ] 5-7 gün sessizlikte resmi başvuru:
+      developer.apple.com/contact/app-store → "request an expedited app review"
+      (King Skor'da 11 günlük sessizliği bu form çözdü; kabul edilirse ret
+      sonrası yeniden gönderimler de otomatik hızlı kuyruğa girer)
+- [ ] "Information Needed" cevabı verildiyse: cevabın + video ekinin dizide
+      GÖNDERİLMİŞ göründüğü teyit edildi (yükleme sessizce başarısız olabiliyor)
+- [ ] Ret sonrası: reddedilen kalemde düzenleme + "Update Review" + App Review
+      sayfasında "Resubmit" basıldı ve durumun "Waiting for Review"a
+      döndüğü GÖZLE teyit edildi
 
 ---
 Kural: Bu listede TEK madde bile boşsa gönderim YAPILMAZ. Liste her retten
