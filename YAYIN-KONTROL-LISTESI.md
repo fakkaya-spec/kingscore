@@ -67,6 +67,10 @@ nedenlerinden damıtılmıştır. (Google Play bölümü en altta.)
 - [ ] TestFlight'ta gerçek cihazda duman testi: masa kur → el gir →
       sonuç ekranı → paywall → geçmiş → ayarlar
 - [ ] Yeni özellikler cihazda görüldü (animasyon/ses gibi şeyler simülatörde değil)
+- [ ] `npx expo config --type introspect` çıktısı tarandı: beklenmeyen
+      UIBackgroundModes, izin (permission) ya da entitlement YOK — eklentiler
+      varsayılanla sessizce ekleyebiliyor (King Skor'da expo-audio'nun
+      varsayılan enableBackgroundPlayback=true değeri 2.5.4 reddi yedirdi)
 
 ## G) Google Play (Android gönderimlerinde ek olarak)
 
