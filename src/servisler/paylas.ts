@@ -6,7 +6,7 @@ import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 
 // YER TUTUCU: App Store ID belli olunca gerçek mağaza linkiyle değiştirilecek.
-const DAVET_LINKI = 'https://apps.apple.com/app/king-skor/id0000000000';
+const DAVET_LINKI = 'https://apps.apple.com/app/id6798316804';
 
 /**
  * Sistem paylaşım sayfasını düz metin davetle açar.
